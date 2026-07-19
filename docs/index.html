@@ -325,15 +325,27 @@ document.addEventListener("DOMContentLoaded", function () {
         <li>Понад 70 відеовправ у зручному Telegram-боті</li>
       </ul>
 
+      <div class="hero-knee__bonus">
+        <span aria-hidden="true">🎁</span>
+        <strong>Бонус:</strong> 6 додаткових відео про найпоширеніші проблеми та травми коліна
+      </div>
+
       <div class="hero-knee__divider"></div>
 
       <p class="hero-knee__price">
         Лише за <strong>390 грн</strong>, замість <span>1899 грн</span>
       </p>
 
-      <p class="hero-knee__price-note">
-        Вартість може змінитися після наступних оновлень програми.
-      </p>
+      <div class="lp-countdown lp-countdown--hero" data-daily-countdown>
+        <p class="lp-countdown__label">До оновлення спеціальної пропозиції:</p>
+        <div class="lp-countdown__units" role="timer" aria-live="off">
+          <div class="lp-countdown__unit"><strong data-countdown-hours>23</strong><span>год</span></div>
+          <span class="lp-countdown__separator" aria-hidden="true">:</span>
+          <div class="lp-countdown__unit"><strong data-countdown-minutes>59</strong><span>хв</span></div>
+          <span class="lp-countdown__separator" aria-hidden="true">:</span>
+          <div class="lp-countdown__unit"><strong data-countdown-seconds>59</strong><span>сек</span></div>
+        </div>
+      </div>
 
       <div class="hero-knee__cta">
         <a class="hero-knee__btn hero-knee__btn--primary" data-scroll-to="#pricing" href="#pricing">
@@ -452,26 +464,188 @@ document.addEventListener("DOMContentLoaded", function () {
   <section class="lp-section lp-section--cream" id="included">
     <div class="lp-shell">
       <div class="lp-heading">
-        <p class="lp-kicker">Що змінюється для вас</p>
-        <h2>Ви отримуєте не просто доступ до відео, а готову структуру занять</h2>
+        <p class="lp-kicker">Усе необхідне вже зібрано в одному місці</p>
+        <h2>Що саме ви отримаєте після оплати</h2>
+        <p>Одразу після оплати відкривається Telegram-бот із готовою послідовністю занять. Не потрібно самостійно шукати вправи, складати план або вирішувати, коли збільшувати навантаження.</p>
       </div>
-      <div class="lp-benefit-grid">
-        <article><img src="./img/ex.jpg" alt="Відеовправи" loading="lazy"><div><h3>Знаєте, які вправи виконувати</h3><p>Понад 70 коротких відео з технікою, повтореннями та варіантами складності.</p></div></article>
-        <article><img src="./img/diag.jpg" alt="Орієнтири прогресу" loading="lazy"><div><h3>Не гадаєте, коли ускладнювати</h3><p>Орієнтири переходу допомагають не поспішати й не залишатися надовго на надто легкому рівні.</p></div></article>
-        <article><img src="./img/teleg.jpg" alt="Програма в Telegram" loading="lazy"><div><h3>Займаєтеся у зручний час</h3><p>Уся послідовність доступна у Telegram-боті з телефона — без складних платформ.</p></div></article>
-        <article><img src="./img/pdf.jpg" alt="Плани занять" loading="lazy"><div><h3>Не втрачаєте план</h3><p>PDF-плани та нагадування допомагають підтримувати регулярність навіть із насиченим графіком.</p></div></article>
-        <article><img src="./img/calendar.jpg" alt="Додаткові модулі" loading="lazy"><div><h3>Маєте додаткові модулі</h3><p>Окремі матеріали для поширених ситуацій, рухливості, контролю та повернення до активності.</p></div></article>
-        <article><img src="./img/center1.jpg" alt="Поступове повернення до навантаження" loading="lazy"><div><h3>Повертаєте навантаження поступово</h3><p>Від простих рухів — до складніших побутових і спортивних завдань у власному темпі.</p></div></article>
+      <div class="lp-benefit-grid lp-benefit-grid--concrete">
+        <article><img src="./img/ex.jpg" alt="Відеовправи для коліна" loading="lazy"><div><p class="lp-card-label">Практична частина</p><h3>Понад 70 відеовправ</h3><p>У кожному відео показана техніка, кількість повторень і підходів. Є простіші та складніші варіанти для адаптації навантаження.</p></div></article>
+        <article><img src="./img/center1.jpg" alt="Два етапи програми" loading="lazy"><div><p class="lp-card-label">Послідовність</p><h3>Два етапи відновлення</h3><p>Перший етап працює з рухливістю, активацією м’язів і контролем. Другий — із силою, стабільністю, витривалістю та поверненням активності.</p></div></article>
+        <article><img src="./img/diag.jpg" alt="Тести та критерії переходу" loading="lazy"><div><p class="lp-card-label">Контроль прогресу</p><h3>Тести та критерії переходу</h3><p>Між етапами є короткі тести й зрозумілі орієнтири, які допомагають вирішити: переходити далі чи ще попрацювати на поточному рівні.</p></div></article>
+        <article><img src="./img/teleg.jpg" alt="Бонусні відео про коліно" loading="lazy"><div><p class="lp-card-label">Додатковий бонус</p><h3>6 тематичних відео</h3><p>Окремі пояснення про найпоширеніші проблеми та травми коліна, локалізацію дискомфорту й особливості підбору навантаження.</p></div></article>
+        <article><img src="./img/calendar.jpg" alt="Нагадування у Telegram" loading="lazy"><div><p class="lp-card-label">Регулярність</p><h3>Нагадування про заняття</h3><p>Нагадування в календарі, щоб було простіше зберігати послідовність і не випадати з процесу.</p></div></article>
+        <article><img src="./img/pdf.jpg" alt="PDF-плани вправ" loading="lazy"><div><p class="lp-card-label">Зручний формат</p><h3>PDF-плани для завантаження</h3><p>Матеріали можна зберегти на телефон, відкрити без постійного пошуку в боті або роздрукувати для виконання вправ.</p></div></article>
+      </div>
+      <div class="lp-included-summary">
+        <strong>У результаті ви отримуєте не випадковий набір вправ, а готовий маршрут.</strong>
+        <p>Що виконувати, у якій послідовності та за якими орієнтирами рухатися далі.</p>
       </div>
     </div>
   </section>
 
+<section class="gr-knee-bonus-modules" id="bonus-modules">
+  <div class="gr-knee-bonus-modules__container">
+    <div class="gr-knee-bonus-modules__heading">
+      <p class="gr-knee-bonus-modules__eyebrow">Додатково до основної програми</p>
+      <h2 class="gr-knee-bonus-modules__title">
+        6 бонусних відео про найпоширеніші ситуації з коліном
+      </h2>
+      <p class="gr-knee-bonus-modules__text">
+        Дискомфорт у різних зонах коліна може мати різні особливості. У бонусних
+        відео я пояснюю, на що варто звернути увагу та як адаптувати вправи під
+        свою ситуацію.
+      </p>
+    </div>
+
+    <div class="gr-knee-bonus-modules__grid">
+      <article class="gr-knee-bonus-modules__card">
+        <div class="gr-knee-bonus-modules__image-wrap">
+          <img
+            src="img/pfb.png"
+            alt="Локалізація дискомфорту навколо або за колінною чашечкою"
+            class="gr-knee-bonus-modules__image"
+          >
+        </div>
+        <div class="gr-knee-bonus-modules__content">
+          <h3 class="gr-knee-bonus-modules__card-title">
+            Дискомфорт навколо або за колінною чашечкою
+          </h3>
+          <p class="gr-knee-bonus-modules__card-text">
+            Чому неприємні відчуття можуть з’являтися під час присідання, спуску
+            сходами або тривалого сидіння та на які м’язи й рухи варто звернути увагу.
+          </p>
+          <p class="gr-knee-bonus-modules__note">
+            Пателофеморальний дискомфорт
+          </p>
+        </div>
+      </article>
+
+      <article class="gr-knee-bonus-modules__card">
+        <div class="gr-knee-bonus-modules__image-wrap">
+          <img
+            src="img/b2.png"
+            alt="Локалізація дискомфорту під колінною чашечкою"
+            class="gr-knee-bonus-modules__image"
+          >
+        </div>
+        <div class="gr-knee-bonus-modules__content">
+          <h3 class="gr-knee-bonus-modules__card-title">
+            Дискомфорт під колінною чашечкою
+          </h3>
+          <p class="gr-knee-bonus-modules__card-text">
+            Що може впливати на появу неприємних відчуттів під час стрибків, бігу,
+            присідання або різкого збільшення навантаження.
+          </p>
+          <p class="gr-knee-bonus-modules__note">
+            Зона сухожилля надколінка — «коліно стрибуна»
+          </p>
+        </div>
+      </article>
+
+      <article class="gr-knee-bonus-modules__card">
+        <div class="gr-knee-bonus-modules__image-wrap">
+          <img
+            src="img/b3.png"
+            alt="Локалізація дискомфорту із зовнішнього боку коліна"
+            class="gr-knee-bonus-modules__image"
+          >
+        </div>
+        <div class="gr-knee-bonus-modules__content">
+          <h3 class="gr-knee-bonus-modules__card-title">
+            Дискомфорт із зовнішнього боку коліна
+          </h3>
+          <p class="gr-knee-bonus-modules__card-text">
+            Чому зовнішня зона може нагадувати про себе під час бігу, тривалої
+            ходьби або повторюваних згинань коліна.
+          </p>
+          <p class="gr-knee-bonus-modules__note">
+            Так зване «коліно бігуна»
+          </p>
+        </div>
+      </article>
+
+      <article class="gr-knee-bonus-modules__card">
+        <div class="gr-knee-bonus-modules__image-wrap">
+          <img
+            src="img/b4.png"
+            alt="Локалізація дискомфорту по внутрішній або зовнішній суглобовій лінії"
+            class="gr-knee-bonus-modules__image"
+          >
+        </div>
+        <div class="gr-knee-bonus-modules__content">
+          <h3 class="gr-knee-bonus-modules__card-title">
+            Дискомфорт по внутрішній або зовнішній суглобовій лінії
+          </h3>
+          <p class="gr-knee-bonus-modules__card-text">
+            Як поводитися після можливої травми меніска, які симптоми потребують
+            додаткової перевірки та як поступово повертати навантаження.
+          </p>
+          <p class="gr-knee-bonus-modules__note">
+            Травми та зміни меніска
+          </p>
+        </div>
+      </article>
+
+      <article class="gr-knee-bonus-modules__card">
+        <div class="gr-knee-bonus-modules__image-wrap">
+          <img
+            src="img/b5.png"
+            alt="Скутість, обмеження руху та дискомфорт після ходьби"
+            class="gr-knee-bonus-modules__image"
+          >
+        </div>
+        <div class="gr-knee-bonus-modules__content">
+          <h3 class="gr-knee-bonus-modules__card-title">
+            Скутість, обмеження руху та дискомфорт після ходьби
+          </h3>
+          <p class="gr-knee-bonus-modules__card-text">
+            Як вправи й поступове дозування навантаження можуть допомагати
+            підтримувати рухливість, силу та повсякденну активність.
+          </p>
+          <p class="gr-knee-bonus-modules__note">
+            Вікові зміни й артроз коліна
+          </p>
+        </div>
+      </article>
+
+      <article class="gr-knee-bonus-modules__card">
+        <div class="gr-knee-bonus-modules__image-wrap">
+          <img
+            src="img/b6.png"
+            alt="Нестабільність або невпевненість після травми коліна"
+            class="gr-knee-bonus-modules__image"
+          >
+        </div>
+        <div class="gr-knee-bonus-modules__content">
+          <h3 class="gr-knee-bonus-modules__card-title">
+            Нестабільність або невпевненість після травми коліна
+          </h3>
+          <p class="gr-knee-bonus-modules__card-text">
+            З чого починати після травм зв’язок, тривалої перерви або періоду
+            обмеженого навантаження та як поступово повертати контроль рухів.
+          </p>
+          <p class="gr-knee-bonus-modules__note">
+            Відновлення після травми коліна
+          </p>
+        </div>
+      </article>
+    </div>
+
+    <div class="gr-knee-bonus-modules__footer">
+      <p>
+        Локалізація дискомфорту сама по собі не визначає діагноз. Бонусні відео
+        мають навчальний характер і допомагають краще зрозуміти свою ситуацію та
+        логіку підбору вправ.
+      </p>
+    </div>
+  </div>
+</section>
   <section class="lp-section lp-section--accent" id="personal">
     <div class="lp-shell lp-personal">
       <div class="lp-personal__content">
-        <p class="lp-kicker">Коли загальної програми недостатньо</p>
-        <h2>Хочете, щоб автор програми допоміг розібрати саме вашу ситуацію?</h2>
-        <p class="lp-personal__lead">Для цього є формат із <strong>індивідуальними рекомендаціями від автора програми</strong>. Він підійде, якщо ви маєте результати обстежень, сумніваєтеся, з чого почати, або хочете поставити свої запитання.</p>
+        <p class="lp-kicker">Не знаєте, як краще стартувати саме у вашій ситуації?</p>
+        <h2>Формат з індивідуальними рекомендаціями автора</h2>
+        <p class="lp-personal__lead">Окрім повного доступу до програми, ви отримаєте можливість поставити свої запитання, показати обстеження та отримати рекомендації щодо того, як краще почати саме у вашому випадку.</p>
         <ul class="lp-checks" role="list">
           <li>Розбір анамнезу, історії дискомфорту та ваших цілей</li>
           <li>Перегляд МРТ, висновків або інших документів, якщо вони є</li>
@@ -522,13 +696,14 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="lp-author__content">
         <p class="lp-kicker">Автор програми</p>
         <h2>Богдан Латиш — фізичний терапевт із понад 10-річним досвідом</h2>
-        <p>За роки практики я працював із понад 2000 людьми з різними запитами щодо коліна та повернення до активності. У цій програмі я зібрав послідовність, яку легко зрозуміти й виконувати вдома.</p>
+        <p>Привіт! Мене звати Богдан. Я фізичний терапевт з понад 10-річним досвідом роботи з травмами коліна, стопи та хребта.</p>
         <ul class="lp-checks" role="list">
-          <li>Навчання за підходами Maitland, Mulligan, PNF, McKenzie та Anatomy Trains</li>
-          <li>Поєднання анатомії, біомеханіки та поступового навантаження</li>
-          <li>Зрозумілі пояснення без складної професійної мови</li>
-          <li>Практична структура, створена на основі роботи з реальними запитами</li>
+          <li>Понад 2000 пацієнтів уже пройшли мої індивідуальні та онлайн-програми.</li>
+          <li>Навчався за міжнародними методиками: Maliggan concept, Maitland, PNF, McKenzie, Thomas Myers (анатомічні поїзди), мануальна терапія.</li>
+          <li>Постійно підвищую кваліфікацію, відвідую конференції та навчаюся у провідних спеціалістів.</li>
+          <li>Поєдную знання анатомії, біомеханіки та доказових підходів для створення ефективних програм, які реально працюють./li>
         </ul>
+         <p>Я створив цей курс, щоб кожен зміг безпечно та ефективно покращити стан стопи, навіть без візиту до клініки. Моя мета — зробити знання та допомогу доступними для кожного.</p>
       </div>
     </div>
   </section>
@@ -553,45 +728,55 @@ document.addEventListener("DOMContentLoaded", function () {
   <section class="lp-section lp-section--pricing" id="pricing">
     <div class="lp-shell">
       <div class="lp-heading">
-        <p class="lp-kicker">Оберіть комфортний формат</p>
-        <h2>Проходити самостійно або отримати допомогу автора на старті</h2>
-        <p>Обидва формати містять повну програму. Різниця — у наявності індивідуальних рекомендацій під вашу ситуацію.</p>
-        <div class="lp-price-policy"><strong>Спеціальна вартість доступна зараз.</strong> Ціна може змінитися після наступних оновлень і розширення програми.</div>
+        <p class="lp-kicker">Оберіть формат</p>
+        <h2>Одна повна програма — два варіанти придбання</h2>
+        <p>В обох форматах ви отримуєте повний доступ до вправ, етапів, тестів, PDF-матеріалів і бонусних відео. Відмінність лише в тому, чи потрібні вам додаткові індивідуальні рекомендації автора.</p>
+        <div class="lp-countdown lp-countdown--pricing" data-daily-countdown>
+          <p class="lp-countdown__label">До оновлення спеціальної пропозиції:</p>
+          <div class="lp-countdown__units" role="timer" aria-live="off">
+            <div class="lp-countdown__unit"><strong data-countdown-hours>23</strong><span>год</span></div>
+            <span class="lp-countdown__separator" aria-hidden="true">:</span>
+            <div class="lp-countdown__unit"><strong data-countdown-minutes>59</strong><span>хв</span></div>
+            <span class="lp-countdown__separator" aria-hidden="true">:</span>
+            <div class="lp-countdown__unit"><strong data-countdown-seconds>59</strong><span>сек</span></div>
+          </div>
+        </div>
       </div>
       <div class="lp-pricing-grid" id="pricing-grid">
         <article class="lp-pricing-card">
-          <p class="lp-card-label">Самостійне проходження</p>
-          <h3>Покрокова програма вправ</h3>
+          <p class="lp-card-label">Повна програма</p>
+          <h3>Курс «Реабілітація коліна»</h3>
           <div class="lp-pricing-card__price"><strong>390</strong><span>грн</span><del>1899 грн</del></div>
-          <p class="lp-pricing-card__fit">Підійде, якщо ви хочете проходити програму самостійно за готовою послідовністю.</p>
+          <p class="lp-pricing-card__fit">Повний доступ до всіх матеріалів і готової послідовності занять.</p>
           <ul class="lp-checks" role="list">
-            <li>70+ відеовправ і 2 послідовні рівні</li>
-            <li>Орієнтири переходу між рівнями</li>
-            <li>6 додаткових тематичних модулів</li>
-            <li>PDF-плани та нагадування</li>
-            <li>Доступ через Telegram-бот</li>
+            <li>Понад 70 відеовправ</li>
+            <li>Два послідовні етапи</li>
+            <li>Тести та критерії переходу</li>
+            <li>6 бонусних тематичних відео</li>
+            <li>Нагадування у Telegram</li>
+            <li>PDF-плани для завантаження</li>
             <li>Довічний доступ до матеріалів</li>
           </ul>
-          <button class="lp-button lp-button--primary lp-button--full pay-btn" data-product-id="knee_390" id="buy-knee-390" type="button">Отримати програму</button>
+          <button class="lp-button lp-button--primary lp-button--full pay-btn" data-product-id="knee_390" id="buy-knee-390" type="button">Отримати повну програму за 390 грн</button>
           <p class="lp-pricing-card__note">14 днів гарантії повернення коштів</p>
         </article>
 
-        <article class="lp-pricing-card lp-pricing-card--featured" id="pricing-pro">
-          <div class="lp-pricing-card__badge">Найчастіше обирають</div>
-          <p class="lp-card-label">Програма + допомога автора</p>
-          <h3>Індивідуальні рекомендації від автора програми</h3>
+        <article class="lp-pricing-card" id="pricing-pro">
+          <p class="lp-card-label">Повна програма + рекомендації автора</p>
+          <h3>Курс та індивідуальні рекомендації від Богдана</h3>
           <div class="lp-pricing-card__price"><strong>890</strong><span>грн</span><del>2899 грн</del></div>
-          <p class="lp-pricing-card__fit">Підійде, якщо хочете краще зрозуміти свою ситуацію і отримати акценти для проходження програми.</p>
+          <p class="lp-pricing-card__fit">Та сама повна програма, а додатково — персональний аналіз вашої ситуації та рекомендації щодо старту.</p>
           <ul class="lp-checks" role="list">
             <li>Усе, що входить у формат за 390 грн</li>
-            <li>Розбір анамнезу, цілей і ваших запитань</li>
-            <li>Перегляд МРТ або інших документів, якщо вони є</li>
-            <li>Аналіз рухових тестів за відео</li>
-            <li>Персональні рекомендації від Богдана</li>
-            <li>Переписка й голосові повідомлення у Telegram</li>
+            <li>Аналіз анамнезу, обмежень і цілей</li>
+            <li>Перегляд МРТ або інших обстежень, якщо вони є</li>
+            <li>Аналіз рухових тестів за надісланими відео</li>
+            <li>Рекомендації щодо початку та проходження програми</li>
+            <li>Відповіді на ваші запитання</li>
+            <li>Переписка та голосові повідомлення у Telegram</li>
             <li>Повторний зв’язок через 2 тижні</li>
           </ul>
-          <button class="lp-button lp-button--primary lp-button--full pay-btn" data-product-id="knee_890" id="buy-knee-890" type="button">Обрати формат із рекомендаціями</button>
+          <button class="lp-button lp-button--primary lp-button--full pay-btn" data-product-id="knee_890" id="buy-knee-890" type="button">Отримати програму з рекомендаціями</button>
           <p class="lp-pricing-card__note">Без дзвінків — відповідаєте на анкету у зручний час</p>
         </article>
       </div>

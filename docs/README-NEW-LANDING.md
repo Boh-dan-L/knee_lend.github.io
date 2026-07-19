@@ -40,3 +40,14 @@
 - Відгуки про програму перенесені нижче, одразу після блоку автора.
 - Спрощено заголовок відгуків про програму.
 - Виправлено контраст тексту у відкритих відповідях FAQ.
+
+
+## Version 6 updates
+
+- Added two synchronized daily countdowns that reset at local midnight.
+- Added a hero bonus callout for six extra videos.
+- Rebuilt the “what is inside” section with concrete product contents.
+- Added a separate six-module bonus section with zone-based visual cues.
+- Updated the individual-recommendations introduction.
+- Removed “most popular” emphasis and equalized the two pricing cards.
+- Kept payment product IDs unchanged: `knee_390` and `knee_890`.
