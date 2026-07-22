@@ -1993,7 +1993,7 @@ body.landing-v4 a {
   line-height: 1.5;
   text-transform: uppercase;
 }
-.lp-kicker {color: var(--lp-yellow);}
+.lp-kicker {color: #04132b;}
 
 .lp-hero h1,
 .lp-heading h2,
@@ -2184,7 +2184,7 @@ body.landing-v4 a {
 .lp-heading > p:last-child {
   max-width: 760px;
   margin: 10px auto 0;
-  color: var(--lp-yellow);
+  color: #06172f;
   font-size: 20px;
 }
 
@@ -3222,7 +3222,7 @@ body.landing-v4 .hero-knee__proof {
 
 /* ===== Landing v5 refinements ===== */
 body.landing-v4 #personal .lp-kicker {
-  color: #17263a;
+  color: #fff;
 }
 
 body.landing-v4 .lp-format-note {
@@ -3771,5 +3771,170 @@ body.landing-v4 .lp-pricing-card h3 {
 
   .gr-knee-bonus-modules__card-text {
     font-size: 15px;
+  }
+}
+/* =========================================================
+   V7: hybrid landing — restored visual language from bohdan.pro/knee
+   ========================================================= */
+
+/* Keep the separate bonus block, but align it with the navy/gold system. */
+.gr-knee-bonus-modules {
+  padding: 46px 16px;
+  background: #ffffff;
+  color: #0b1d3a;
+}
+
+.gr-knee-bonus-modules__container {
+  max-width: var(--container, 1120px);
+}
+
+.gr-knee-bonus-modules__heading {
+  max-width: 860px;
+  margin: 0 0 24px;
+  text-align: left;
+}
+
+.gr-knee-bonus-modules__eyebrow {
+  margin-bottom: 8px;
+  color: #8a5a00;
+}
+
+.gr-knee-bonus-modules__title {
+  margin-bottom: 10px;
+  font-size: clamp(22px, 4.6vw, 32px);
+  color: #0b1d3a;
+}
+
+.gr-knee-bonus-modules__text {
+  max-width: 860px;
+  font-size: 16px;
+  color: #444;
+}
+
+.gr-knee-bonus-modules__grid {
+  gap: 18px;
+}
+
+.gr-knee-bonus-modules__card {
+  border-radius: 18px;
+  background: var(--tone-deep);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(0,0,0,.12);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.gr-knee-bonus-modules__card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(0,0,0,.18);
+}
+
+.gr-knee-bonus-modules__image-wrap {
+  background: #f4efe5;
+}
+
+.gr-knee-bonus-modules__content {
+  gap: 9px;
+  padding: 16px 16px 19px;
+}
+
+.gr-knee-bonus-modules__card-title {
+  font-size: 17px;
+  color: #fff;
+}
+
+.gr-knee-bonus-modules__card-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(255,255,255,.86);
+}
+
+.gr-knee-bonus-modules__note {
+  color: #f0b429;
+}
+
+.gr-knee-bonus-modules__footer {
+  margin-top: 28px;
+  border: 1px solid #ddebea;
+  background: #f6fafa;
+}
+
+/* Make the recommendation block feel like part of the same navy/gold brand. */
+#personal.lp-section--accent {
+  background:
+    radial-gradient(circle at 92% 4%, rgba(74,163,255,.20), transparent 30%),
+    var(--c-bgk);
+  color: #0b1d3a;
+}
+
+.lp-personal__content h2 {
+  color: #f6fafa ;
+}
+
+.lp-kickers {
+  color: #f6fafa ;
+}
+
+#personal .lp-personal__lead,
+#personal .lp-checks li,
+#personal .lp-format-note p {
+  color: rgba(255,255,255,.86);
+}
+
+#personal .lp-format-note {
+  border-color: rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
+}
+
+#personal .lp-format-note strong {
+  color: #f0b429;
+}
+
+#personal .lp-personal .lp-checks li::before {
+  background: #f0b429;
+  color: #0b1d3a;
+}
+
+#personal .lp-button--contrast {
+  background: #f0b429;
+  color: #0b1d3a;
+}
+
+/* Old pricing cards with robust, full-width CTA buttons. */
+.pricing .lp-countdown--pricing {
+  margin: 22px 0 24px;
+}
+
+.pricing .pricing__btn {
+  display: inline-flex;
+  width: 100%;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 0;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.pricing__card--pro .pricing__btn {
+  background: #f0b429;
+  color: #0b1d3a;
+}
+
+/* Preserve good mobile spacing in restored old-style blocks. */
+@media (max-width: 640px) {
+  .who--alt,
+  .why,
+  .included--alt,
+  .program,
+  .pricing,
+  .gr-knee-bonus-modules {
+    padding-block: 38px;
+  }
+
+  .program__remind-actions .btn {
+    width: 100%;
   }
 }
