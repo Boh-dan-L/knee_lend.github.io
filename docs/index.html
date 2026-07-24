@@ -381,6 +381,36 @@ document.addEventListener("DOMContentLoaded", function () {
           data.currency
         );
 
+                // Server InitiateCheckout через CAPI
+        const checkoutMetaRequest = fetch(API_URL + "/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            order_reference: data.orderReference
+          }),
+          keepalive: true
+        })
+          .then(async function (response) {
+            const result = await response.json();
+
+            console.log("Meta InitiateCheckout CAPI:", {
+              status: response.status,
+              result: result
+            });
+
+            return result;
+          })
+          .catch(function (error) {
+            console.error("Meta InitiateCheckout CAPI error:", error);
+
+            return {
+              ok: false,
+              error: String(error)
+            };
+          });
+
         const payment = data.payment;
         const form = document.createElement("form");
         form.method = "POST";
