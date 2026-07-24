@@ -6,6 +6,8 @@
 <meta content="Покрокова програма відновлення коліна вдома: 70+ відеовправ, два етапи, тести між етапами, PDF-плани та 6 бонусних відео." name="description"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Реабілітація коліна — покрокова програма вправ</title>
 <link href="./knee.css" rel="stylesheet"/>
+<link rel="preconnect" href="https://bayer-1078313683185.europe-west1.run.app" crossorigin>
+
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&amp;display=swap" rel="stylesheet"/>
 <!-- Google Tag Manager -->
@@ -173,6 +175,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 document.addEventListener("DOMContentLoaded", function () {
   const API_URL = "https://bayer-1078313683185.europe-west1.run.app";
   const buttons = document.querySelectorAll(".pay-btn");
+  const PAGE_LOADED_AT_MS = Date.now();
 
   if (!buttons.length) return;
 
@@ -193,6 +196,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  function getNavigationMetrics() {
+    const nav = performance.getEntriesByType?.("navigation")?.[0];
+    if (!nav) return null;
+
+    return {
+      dom_content_loaded_ms: Math.round(nav.domContentLoadedEventEnd),
+      load_event_ms: Math.round(nav.loadEventEnd),
+      response_end_ms: Math.round(nav.responseEnd)
+    };
+  }
+
   function buildAttributionPayload() {
     return {
       external_id: getLS("meta_external_id"),
@@ -204,8 +218,86 @@ document.addEventListener("DOMContentLoaded", function () {
       utm_adset: getLS("meta_last_utm_adset") || getLS("meta_first_utm_adset") || null,
       utm_content: getLS("meta_last_utm_content") || getLS("meta_first_utm_content") || null,
       utm_term: getLS("meta_last_utm_term") || getLS("meta_first_utm_term") || null,
-      first_seen_at: Number(getLS("meta_first_seen_at")) || null
+      first_seen_at: Number(getLS("meta_first_seen_at")) || null,
+      last_seen_at: Number(getLS("meta_last_seen_at")) || null
     };
+  }
+
+  function trackDiagnostic(eventName, details) {
+    const payload = {
+      event_name: eventName,
+      session_id: getLS("meta_external_id"),
+      landing_id: window.APP_CONFIG?.landing_id || null,
+      pixel_key: window.APP_CONFIG?.pixel_key || null,
+      page_url: window.location.origin + window.location.pathname,
+      client_event_time_ms: Date.now(),
+      attribution: buildAttributionPayload(),
+      details: details || {}
+    };
+
+    try {
+      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(API_URL + "/track", blob);
+        return;
+      }
+    } catch (error) {
+      console.warn("sendBeacon unavailable:", error);
+    }
+
+    fetch(API_URL + "/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      keepalive: true
+    }).catch(function () {});
+  }
+
+  let warmupStarted = false;
+
+  function warmPaymentService(reason) {
+    if (warmupStarted) return;
+    warmupStarted = true;
+
+    const startedAt = performance.now();
+
+    fetch(API_URL + "/health", {
+      method: "GET",
+      cache: "no-store",
+      mode: "cors"
+    })
+      .then(function (response) {
+        console.log("payment service warm-up:", reason, Math.round(performance.now() - startedAt), "ms", response.status);
+      })
+      .catch(function (error) {
+        console.warn("payment service warm-up failed:", error);
+        warmupStarted = false;
+      });
+  }
+
+  window.setTimeout(function () {
+    warmPaymentService("page-load");
+  }, 800);
+
+  buttons.forEach(function (button) {
+    ["pointerenter", "touchstart", "focus"].forEach(function (eventName) {
+      button.addEventListener(eventName, function () {
+        warmPaymentService(eventName);
+      }, { once: true, passive: true });
+    });
+  });
+
+  function pushBrowserCheckoutEvent(checkoutEventId, orderReference, value, currency) {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "meta_initiate_checkout",
+      checkout: {
+        event_id: checkoutEventId,
+        order_ref: orderReference,
+        value: Number(value) || 0,
+        currency: currency || "UAH"
+      }
+    });
   }
 
   buttons.forEach(function (btn) {
@@ -213,14 +305,31 @@ document.addEventListener("DOMContentLoaded", function () {
       e.preventDefault();
 
       const originalText = btn.textContent;
-      const eventId = uuidv4();
+      const purchaseEventId = uuidv4();
+      const checkoutEventId = uuidv4();
+      const clickedAtMs = Date.now();
+      const productId = btn.dataset.productId;
+
+      trackDiagnostic("payment_button_clicked", {
+        product_id: productId,
+        checkout_event_id: checkoutEventId,
+        purchase_event_id: purchaseEventId,
+        page_loaded_at_ms: PAGE_LOADED_AT_MS,
+        time_on_page_before_click_ms: clickedAtMs - PAGE_LOADED_AT_MS,
+        navigation: getNavigationMetrics()
+      });
 
       const payload = {
-        event_id: eventId,
+        event_id: purchaseEventId,
+        purchase_event_id: purchaseEventId,
+        checkout_event_id: checkoutEventId,
         landing_id: window.APP_CONFIG?.landing_id || null,
         pixel_key: window.APP_CONFIG?.pixel_key || null,
-        product_id: btn.dataset.productId,
+        product_id: productId,
         event_source_url: window.location.href,
+        client_clicked_at_ms: clickedAtMs,
+        page_loaded_at_ms: PAGE_LOADED_AT_MS,
+        navigation: getNavigationMetrics(),
         attribution: buildAttributionPayload()
       };
 
@@ -232,7 +341,7 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.classList.add("is-loading");
         btn.style.pointerEvents = "none";
 
-        const startedAt = Date.now();
+        const startedAt = performance.now();
 
         const res = await fetch(API_URL, {
           method: "POST",
@@ -242,7 +351,8 @@ document.addEventListener("DOMContentLoaded", function () {
           body: JSON.stringify(payload)
         });
 
-        console.log("create-order ms:", Date.now() - startedAt);
+        const createOrderMs = Math.round(performance.now() - startedAt);
+        console.log("create-order ms:", createOrderMs);
         console.log("response status:", res.status);
 
         const data = await res.json();
@@ -251,6 +361,25 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!res.ok || !data.ok || !data.payment) {
           throw new Error(data.error || "Не вдалося створити оплату");
         }
+
+        trackDiagnostic("payment_order_created", {
+          product_id: productId,
+          order_reference: data.orderReference,
+          checkout_event_id: checkoutEventId,
+          purchase_event_id: purchaseEventId,
+          create_order_client_ms: createOrderMs,
+          server_timings: data.diagnostics || null,
+          meta_checkout_sent: data.meta_checkout?.ok === true
+        });
+
+        // Browser-side InitiateCheckout is fired through GTM from this custom dataLayer event.
+        // It uses the same event_id as the server-side CAPI event for deduplication.
+        pushBrowserCheckoutEvent(
+          checkoutEventId,
+          data.orderReference,
+          data.value,
+          data.currency
+        );
 
         const payment = data.payment;
         const form = document.createElement("form");
@@ -278,15 +407,35 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         document.body.appendChild(form);
-        form.submit();
+
+        trackDiagnostic("payment_form_submitted", {
+          product_id: productId,
+          order_reference: data.orderReference,
+          checkout_event_id: checkoutEventId,
+          purchase_event_id: purchaseEventId,
+          total_client_ms_from_click: Date.now() - clickedAtMs
+        });
+
+        // A short delay gives the diagnostic beacon and dataLayer event time to leave the page.
+        window.setTimeout(function () {
+          form.submit();
+        }, 80);
 
       } catch (error) {
         console.error("Помилка create-order/payment:", error);
+
+        trackDiagnostic("payment_error", {
+          product_id: productId,
+          checkout_event_id: checkoutEventId,
+          purchase_event_id: purchaseEventId,
+          message: String(error?.message || error)
+        });
+
         btn.textContent = originalText;
         btn.disabled = false;
         btn.classList.remove("is-loading");
         btn.style.pointerEvents = "";
-        alert("Не вдалося створити оплату. Спробуй ще раз.");
+        alert("Не вдалося створити оплату. Спробуйте ще раз.");
       }
     });
   });
