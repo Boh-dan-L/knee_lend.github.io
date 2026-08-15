@@ -6,10 +6,22 @@
 <meta content="Покрокова програма відновлення коліна вдома: 70+ відеовправ, два етапи, тести між етапами, PDF-плани та 6 бонусних відео." name="description"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Реабілітація коліна — покрокова програма вправ</title>
 <link href="./knee.css" rel="stylesheet"/>
-<link rel="preconnect" href="https://bayer-1078313683185.europe-west1.run.app" crossorigin>
-
+<link crossorigin="" href="https://bayer-1078313683185.europe-west1.run.app" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<script>
+  window.APP_CONFIG = {
+    landing_id: "knee",
+    pixel_key: "pixel_knee"
+  };
+
+  // Доступно GTM ще до завантаження контейнера.
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    landing_id: window.APP_CONFIG.landing_id,
+    pixel_key: window.APP_CONFIG.pixel_key
+  });
+</script>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -17,12 +29,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-TPZT7VDW');</script>
 <!-- End Google Tag Manager -->
-<script>
-  window.APP_CONFIG = {
-    landing_id: "knee",
-    pixel_key: "pixel_knee"
-  };
-</script>
 <script>
 (function () {
   function getParam(name) {
@@ -72,24 +78,30 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     return id;
   }
 
-  function updateStoredFbp() {
+  function updateStoredMetaCookies() {
     const currentFbp = getCookie("_fbp");
-    const storedFbp = getLS("meta_fbp");
+    const currentFbc = getCookie("_fbc");
 
-    if (currentFbp && currentFbp !== storedFbp) {
+    if (currentFbp && currentFbp !== getLS("meta_fbp")) {
       setLS("meta_fbp", currentFbp);
+    }
+
+    // Передаємо справжній _fbc без змін. Його creationTime уже в мілісекундах.
+    if (currentFbc && currentFbc !== getLS("meta_fbc")) {
+      setLS("meta_fbc", currentFbc);
     }
   }
 
-  function waitForFbp(retries, delay) {
-    updateStoredFbp();
+  function waitForMetaCookies(retries, delay) {
+    updateStoredMetaCookies();
 
-    const fbp = getLS("meta_fbp");
-    if (fbp) return;
+    const hasFbp = !!getLS("meta_fbp");
+    const hasFbcOrNoClick = !!getLS("meta_fbc") || !getParam("fbclid");
+    if (hasFbp && hasFbcOrNoClick) return;
 
     if (retries > 0) {
       setTimeout(function () {
-        waitForFbp(retries - 1, delay);
+        waitForMetaCookies(retries - 1, delay);
       }, delay);
     }
   }
@@ -104,12 +116,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   };
 
   const fbclid = getParam("fbclid");
-  const nowTs = String(Math.floor(Date.now() / 1000));
+  // ВАЖЛИВО: Meta fbc creationTime працює в мілісекундах. Не ділити Date.now() на 1000.
+  const nowTs = String(Date.now());
 
   ensureExternalId();
 
-  updateStoredFbp();
-  waitForFbp(15, 300);
+  updateStoredMetaCookies();
+  waitForMetaCookies(15, 300);
 
   const hasAttributionInUrl =
     Object.values(utm).some(Boolean) || !!fbclid;
@@ -132,6 +145,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     setLS("meta_first_seen_at", nowTs);
   }
 
+  // Окремо зберігаємо точний час отримання fbclid.
+  // Саме цей timestamp використовується як creationTime для fbc.
+  if (fbclid) {
+    if (!getLS("meta_first_fbclid")) {
+      setLS("meta_first_fbclid", fbclid);
+      setLS("meta_first_fbclid_seen_at", nowTs);
+    }
+
+    setLS("meta_last_fbclid", fbclid);
+    setLS("meta_last_fbclid_seen_at", nowTs);
+  }
+
   // LAST TOUCH
   if (hasAttributionInUrl) {
     setLS("meta_last_seen_at", nowTs);
@@ -148,6 +173,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   console.log("ATTR INIT", {
     external_id: getLS("meta_external_id"),
     fbp: getLS("meta_fbp"),
+    fbc: getLS("meta_fbc"),
     first: {
       seen_at: getLS("meta_first_seen_at"),
       fbclid: getLS("meta_first_fbclid"),
@@ -211,7 +237,12 @@ document.addEventListener("DOMContentLoaded", function () {
     return {
       external_id: getLS("meta_external_id"),
       fbp: getLS("meta_fbp"),
+      fbc: getLS("meta_fbc"),
       fbclid: getLS("meta_last_fbclid") || getLS("meta_first_fbclid") || null,
+      fbclid_seen_at: Number(
+        getLS("meta_last_fbclid_seen_at") ||
+        getLS("meta_first_fbclid_seen_at")
+      ) || null,
       utm_source: getLS("meta_last_utm_source") || getLS("meta_first_utm_source") || null,
       utm_medium: getLS("meta_last_utm_medium") || getLS("meta_first_utm_medium") || null,
       utm_campaign: getLS("meta_last_utm_campaign") || getLS("meta_first_utm_campaign") || null,
@@ -372,8 +403,8 @@ document.addEventListener("DOMContentLoaded", function () {
           meta_checkout_sent: data.meta_checkout?.ok === true
         });
 
-        // Browser-side InitiateCheckout is fired through GTM from this custom dataLayer event.
-        // It uses the same event_id as the server-side CAPI event for deduplication.
+        // Старий GTM очікує custom event meta_initiate_checkout.
+        // Той самий checkout_event_id передається і в браузерний Pixel, і в CAPI для дедуплікації.
         pushBrowserCheckoutEvent(
           checkoutEventId,
           data.orderReference,
@@ -381,8 +412,8 @@ document.addEventListener("DOMContentLoaded", function () {
           data.currency
         );
 
-                // Server InitiateCheckout через CAPI
-        const checkoutMetaRequest = fetch(API_URL + "/checkout", {
+        // Server-side InitiateCheckout через CAPI.
+        fetch(API_URL + "/checkout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -448,8 +479,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // A short delay gives the diagnostic beacon and dataLayer event time to leave the page.
         window.setTimeout(function () {
+          trackDiagnostic("payment_redirect_started", {
+            product_id: productId,
+            order_reference: data.orderReference,
+            checkout_event_id: checkoutEventId,
+            purchase_event_id: purchaseEventId,
+            total_client_ms_from_click: Date.now() - clickedAtMs
+          });
           form.submit();
-        }, 80);
+        }, 100);
 
       } catch (error) {
         console.error("Помилка create-order/payment:", error);
@@ -471,167 +509,333 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 </script>
-<meta content="Покрокова програма вправ для коліна" property="og:title"/><meta content="Зрозуміла домашня програма для поступового повернення рухливості, сили та впевненості у щоденних навантаженнях." property="og:description"/></head>
-<body class="landing-v4" data-landing="knee">
+<meta content="Покрокова програма вправ для коліна" property="og:title"/><meta content="Зрозуміла домашня програма для поступового повернення рухливості, сили та впевненості у щоденних навантаженнях." property="og:description"/></link></head>
+<body class="landing-v4" data-landing="knee-general">
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-TPZT7VDW" style="display:none;visibility:hidden" width="0"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+ <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const lazyVideos = document.querySelectorAll('.js-lazy-video');
+
+    if (!lazyVideos.length) return;
+
+    const loadVideo = (video) => {
+      if (video.dataset.loaded === 'true') return;
+
+      const sources = video.querySelectorAll('source[data-src]');
+
+      sources.forEach((source) => {
+        source.src = source.dataset.src;
+        source.removeAttribute('data-src');
+      });
+
+      video.dataset.loaded = 'true';
+      video.load();
+
+      const tryPlay = () => {
+        const playPromise = video.play();
+
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Autoplay може бути заблокований браузером.
+            // Poster при цьому залишиться видимим.
+          });
+        }
+      };
+
+      if (video.readyState >= 2) {
+        tryPlay();
+      } else {
+        video.addEventListener('canplay', tryPlay, { once: true });
+      }
+    };
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries, observerInstance) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+
+            loadVideo(entry.target);
+            observerInstance.unobserve(entry.target);
+          });
+        },
+        {
+          // Відео почне завантажуватися трохи раніше,
+          // ніж користувач реально доскролить до нього.
+          rootMargin: '400px 0px',
+          threshold: 0.01
+        }
+      );
+
+      lazyVideos.forEach((video) => {
+        observer.observe(video);
+      });
+    } else {
+      // Fallback для дуже старих браузерів
+      lazyVideos.forEach(loadVideo);
+    }
+  });
+</script>
 <main>
 <section class="hero-knee" id="hero">
 <div aria-hidden="true" class="hero-knee__photo"></div>
 <div aria-hidden="true" class="hero-knee__shade"></div>
 <div class="hero-knee__inner">
-<p class="hero-knee__eyebrow">
-        Авторська програма від фізичного терапевта з понад 10-річним досвідом
-      </p>
-<h1 class="hero-knee__title">
-        Зніми біль у коліні і
-        <span>повернись до повноцінного життя</span>
-</h1>
-<p class="hero-knee__subtitle">
-        Безпечна система вправ та самомасажу: зменшує біль й допомагає повернутись до активності —
-        <strong>від 15 хвилин на день.</strong>
-</p>
+<p class="hero-knee__eyebrow">Авторська програма від фізичного терапевта із понад 10-річним досвідом</p>
+<h1 class="hero-knee__title">Зніміть біль у коліні та <span>поверніться до активного життя</span></h1>
+<p class="hero-knee__subtitle">Покрокова програма допоможе зрозуміти, <strong>які вправи виконувати зараз, як дозувати навантаження та коли переходити до складнішого рівня</strong> — щоб поступово повернути силу, контроль і витривалість коліна.</p>
 <ul class="hero-knee__bullets" role="list">
-<li>Підходить при болю, травмах та артрозі</li>
-<li>Відновлення крок за кроком</li>
-<li>Понад 70 відеовправ у зручному Telegram-боті</li>
+<li>Вправи з готовим дозуванням і варіантами прогресії</li>
+<li>Тести та критерії переходу між етапами</li>
+<li>Від базового рівня до сили, контролю й активніших навантажень</li>
 </ul>
-<div class="hero-knee__bonus">
-<span aria-hidden="true">🎁</span>
-<strong>Бонус:</strong> 6 додаткових відео про найпоширеніші проблеми та травми коліна
-      </div>
+<div class="hero-knee__bonus"><span aria-hidden="true">🎁</span><strong>Додатково:</strong> 6 відео про найпоширеніші проблеми та травми коліна</div>
 <div class="hero-knee__divider"></div>
-<p class="hero-knee__price">
-        Лише за <strong>390 грн</strong>, замість <span>1899 грн</span>
-</p>
-<div class="lp-countdown lp-countdown--hero" data-daily-countdown="">
-<p class="lp-countdown__label">До кінця спеціальної пропозиції:</p>
-<div aria-live="off" class="lp-countdown__units" role="timer">
-<div class="lp-countdown__unit"><strong data-countdown-hours="">23</strong><span>год</span></div>
-<span aria-hidden="true" class="lp-countdown__separator">:</span>
-<div class="lp-countdown__unit"><strong data-countdown-minutes="">59</strong><span>хв</span></div>
-<span aria-hidden="true" class="lp-countdown__separator">:</span>
-<div class="lp-countdown__unit"><strong data-countdown-seconds="">59</strong><span>сек</span></div>
-</div>
-</div>
-<div class="hero-knee__cta">
-<a class="hero-knee__btn hero-knee__btn--primary" data-scroll-to="#pricing" href="#pricing">
-          Переглянути програму
-        </a>
-</div>
-<p class="hero-knee__proof">
-<span>1200+</span> учасників уже покращили свій стан
-      </p>
+<p class="hero-knee__price">Повна програма за <strong>390 грн</strong> <span>1899 грн</span></p>
+<div class="hero-knee__cta"><a class="hero-knee__btn hero-knee__btn--primary" data-scroll-to="#pricing" href="#pricing">Почати програму за 390 грн</a></div>
+<p class="hero-knee__delivery">Доступ одразу після оплати • Telegram • 14 днів гарантії</p>
+<p class="hero-knee__proof"><span>1200+</span> учасників уже отримали програму</p>
 </div>
 </section>
-<section class="who who--alt" id="who">
+<section aria-label="Ключові переваги програми" class="sales-proof">
+<div class="sales-proof__inner">
+<div class="sales-proof__item"><strong>15–30 хв</strong><span>типова тривалість заняття</span></div>
+<div class="sales-proof__item"><strong>2 етапи</strong><span>від базового рівня до функціонального</span></div>
+<div class="sales-proof__item"><strong>Одразу</strong><span>доступ до програми після оплати</span></div>
+</div>
+</section>
+<section class="rehab-story rehab-story--compact" id="why">
+<div class="sales-shell">
+<p class="sales-kicker">Чому проблема може повертатися</p>
+<h2 class="sales-title">Чому біль у коліні повертається, навіть якщо ви вже лікувалися?</h2>
+<p class="sales-lead">На консультаціях я найчастіше бачу три сценарії. Вони різні, але в кожному випадку навантаження перестає відповідати тому, до чого коліно готове саме зараз.</p>
+<div class="rehab-story__grid">
+<article class="rehab-story__card" data-reveal="">
+<span class="rehab-story__num">01</span>
+<h3>Занадто швидко повернули навантаження</h3>
+<p>Стало легше — і людина одразу повертається до бігу, футболу, залу або попереднього обсягу активності. Симптоми вже менші, але сила, витривалість і контроль ще можуть бути недостатніми.</p>
+</article>
+<article class="rehab-story__card" data-reveal="">
+<span class="rehab-story__num">02</span>
+<h3>Навпаки — почали уникати навантаження</h3>
+<p>Через страх повторного болю, стару травму, артроз або зміни на МРТ людина починає надмірно берегти коліно й не розуміє, які вправи вже можна виконувати без зайвого страху.</p>
+</article>
+<article class="rehab-story__card" data-reveal="">
+<span class="rehab-story__num">03</span>
+<h3>Робили вправи, але без прогресії</h3>
+<p>Один комплекс може дати перші зміни. Але далі виникає головне питання: коли додати вагу, ускладнити вправу або повертатися до більшої активності?</p>
+</article>
+</div>
+<div class="rehab-story__common rehab-story__common--compact" data-reveal="">
+<div><p class="sales-kicker">Спільна причина</p><h3>Навантаження не відповідає поточній готовності коліна</h3></div>
+<p>Або його стає забагато і занадто швидко, або занадто мало через страх, або воно змінюється хаотично. Тому важливо не просто «прибрати біль», а поступово повернути коліну здатність переносити потрібний вам рівень активності.</p>
+</div>
+</div>
+</section>
+<section class="exercise-gap exercise-gap--compact">
+<div class="sales-shell">
+<div class="exercise-gap__heading">
+<p class="sales-kicker">Чому просто знайти вправи недостатньо</p>
+<h2 class="sales-title">Знайти вправи легко. Складніше — зрозуміти, як ними користуватися</h2>
+<p class="sales-lead">У YouTube, Instagram чи TikTok є десятки безкоштовних комплексів. Але вони рідко відповідають на питання, <strong>який рівень підходить вам зараз і коли потрібно рухатися далі.</strong></p>
+</div>
+<div class="exercise-gap__layout">
+<div aria-hidden="true" class="exercise-gap__search" data-reveal="">
+<div class="exercise-gap__searchbar">🔎   вправи від болю в коліні</div>
+<div class="exercise-gap__video"><span>5 вправ для коліна</span><small>10:24</small></div>
+<div class="exercise-gap__video"><span>Топ вправ при артрозі</span><small>08:17</small></div>
+<div class="exercise-gap__video"><span>Вправи для меніска</span><small>12:05</small></div>
+<p>Вправ багато. Але план відновлення з цього не з’являється автоматично.</p>
+</div>
+<div class="exercise-gap__questions" data-reveal="">
+<h3>Потрібно знати не тільки «що робити», а й:</h3>
+<ul>
+<li>яку вправу обрати саме зараз і скільки її виконувати;</li>
+<li>як зрозуміти, що навантаження вже надмірне;</li>
+<li>коли додати повторення, вагу або складніший рух;</li>
+<li>коли, навпаки, зробити крок назад;</li>
+<li>коли коліно вже готове до більшої активності.</li>
+</ul>
+<div class="exercise-gap__claim"><strong>Тому вам потрібен не ще один список вправ.</strong><span>Потрібна система прогресії навантаження.</span></div>
+</div>
+</div>
+</div>
+</section>
+<section class="method-map method-map--compact" id="method">
+<div class="sales-shell">
+<p class="sales-kicker">Як має виглядати системне відновлення</p>
+<h2 class="sales-title">Не один комплекс, а зрозуміла послідовність</h2>
+<p class="sales-lead">Починаєте з доступного рівня, контролюєте реакцію коліна й переходите далі не навмання, а за зрозумілими орієнтирами.</p>
+<ol class="method-map__steps">
+<li data-reveal=""><span class="method-map__num">1</span><div><h3>Стартовий рівень</h3><p>Вправи відповідають тому навантаженню, яке коліно переносить зараз.</p></div></li>
+<li data-reveal=""><span class="method-map__num">2</span><div><h3>Готове дозування</h3><p>Зрозуміло, скільки повторень і підходів виконувати.</p></div></li>
+<li data-reveal=""><span class="method-map__num">3</span><div><h3>Контроль реакції</h3><p>Оцінюєте стан під час вправ, після заняття та наступного дня.</p></div></li>
+<li data-reveal=""><span class="method-map__num">4</span><div><h3>Тести й критерії</h3><p>Перевіряєте, чи готові переходити до наступного рівня.</p></div></li>
+<li data-reveal=""><span class="method-map__num">5</span><div><h3>Прогресія</h3><p>Поступово додаєте складність і повертаєте потрібну активність.</p></div></li>
+</ol>
+<div class="method-map__finish" data-reveal=""><span>Мета</span><i aria-hidden="true">→</i><strong>не просто менше болю, а більше готовності до навантаження</strong></div>
+</div>
+</section>
+<section class="method-compare">
+<div class="sales-shell">
+<p class="sales-kicker sales-kicker--light">Саме так побудована програма</p>
+<h2 class="method-compare__title">Цінність не в «секретній вправі». Цінність — у системі прогресії</h2>
+<p class="method-compare__lead">Одна й та сама вправа може бути доречною на одному етапі й занадто легкою або складною на іншому. Тому програма не видає всі матеріали як один випадковий список.</p>
+<div class="method-compare__grid">
+<article class="method-compare__card method-compare__card--muted" data-reveal="">
+<p class="method-compare__label">Звичайний комплекс з інтернету</p>
+<h3>«Ось 5 вправ — робіть їх щодня»</h3>
+<ul>
+<li>один набір вправ;</li>
+<li>однакова складність незалежно від етапу;</li>
+<li>часто незрозуміле дозування;</li>
+<li>немає критеріїв, коли ускладнювати;</li>
+<li>незрозуміло, що робити через 2–3 тижні;</li>
+<li>повернення до навантаження доводиться планувати самостійно.</li>
+</ul>
+</article>
+<article class="method-compare__card method-compare__card--accent" data-reveal="">
+<p class="method-compare__label">Покрокова програма</p>
+<h3>«Зрозумійте свій рівень і рухайтеся далі за критеріями»</h3>
+<ul>
+<li>вправи розділені від простіших до складніших;</li>
+<li>є готове дозування та варіанти прогресії;</li>
+<li>є контроль реакції на навантаження;</li>
+<li>є тести й критерії переходу;</li>
+<li>є наступний етап, коли базового рівня вже недостатньо;</li>
+<li>є логіка поступового повернення до активності.</li>
+</ul>
+</article>
+</div>
+<div class="method-compare__cta" data-reveal="">
+<p><strong>Саме тому 2 етапи, тести й 70+ відео — це не просто «більше матеріалів».</strong> Вони потрібні, щоб ви розуміли свій поточний рівень і наступний крок.</p>
+<a class="btn btn--primary lp-button lp-button--primary" data-scroll-to="#included" href="#included">Подивитися, як побудована програма</a>
+</div>
+</div>
+</section>
+<section class="product-preview" id="preview">
+  <div class="sales-shell product-preview__inner">
+
+    <div class="product-preview__copy" data-reveal>
+      <p class="sales-kicker">Саме так побудована програма</p>
+
+      <h2>
+        Відкрили Telegram — і бачите, що робити далі
+      </h2>
+
+      <p>
+        Етапи, вправи, тести, бонусні матеріали та нагадування
+        зібрані в одному місці. Не потрібно самостійно складати
+        план із десятків різних відео.
+      </p>
+
+      <div class="product-preview__actions">
+        <a
+          class="btn btn--primary lp-button lp-button--primary"
+          data-scroll-to="#pricing"
+          href="#pricing"
+        >
+          Почати програму за 390 грн
+        </a>
+
+        <span>Доступ одразу після оплати</span>
+      </div>
+    </div>
+
+    <figure class="product-preview__media product-preview__media--video" data-reveal>
+      <video
+        class="product-preview__video js-lazy-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="none"
+        poster="./img/teleg.jpg"
+        aria-label="Демонстрація програми відновлення коліна в Telegram"
+      >
+        <source
+          data-src="./video/telegram-demo.MOV"
+          type="video/mp4"
+        >
+      </video>
+    </figure>
+
+  </div>
+</section>
+<section class="lp-section lp-section--light" id="reviews">
+<div class="lp-shell">
+<div class="lp-heading">
+<p class="lp-kicker">Коротко про досвід учасників</p>
+<h2>Що пишуть після проходження програми</h2>
+</div>
+<div class="lp-review-grid">
+<figure><img alt="Відгук про заняття та сходи" loading="lazy" src="./img/3.jpg"/></figure>
+<figure><img alt="Відгук про програму вправ" loading="lazy" src="./img/5.jpg"/></figure>
+<figure><img alt="Відгук про вправи для коліна" loading="lazy" src="./img/6.jpg"/></figure>
+<figure><img alt="Відгук про результат програми" loading="lazy" src="./img/8.jpg"/></figure>
+</div>
+</div>
+</section><section class="who who--alt" id="who">
 <div class="who__inner">
-<h2 class="who__title">Для кого цей курс</h2>
-<p class="who__lead">Курс для тих, хто хоче безпечно зняти біль у коліні та повернутись до активності вдома — без ліків і дорогих процедур.</p>
+<p class="sales-kicker">Кому особливо корисна така структура</p><h2 class="who__title">Для кого ця програма</h2>
+<p class="who__lead">Вище ми вже розібрали логіку відновлення. Тут — типові ситуації, у яких особливо важливо мати зрозумілу прогресію навантаження.</p>
 <div class="who__grid">
 <article class="who__card">
 <div class="who__media"><img alt="Дискомфорт у коліні під час ходьби або спуску сходами" loading="lazy" src="./img/stairs.jpg"/></div>
 <div class="who__body">
 <h3 class="who__h">Щоденний дискомфорт</h3>
-<p class="who__p">Якщо коліно болить навіть при ходьбі чи сходах — курс допоможе відновити функцію.</p>
+<p class="who__p">Коли ходьба, підйом або спуск сходами провокують дискомфорт і хочеться повернути ці навантаження поступово.</p>
 </div>
 </article>
 <article class="who__card">
 <div class="who__media"><img alt="Поступове відновлення після травми коліна" loading="lazy" src="./img/surg.jpg"/></div>
 <div class="who__body">
 <h3 class="who__h">Після травм коліна</h3>
-<p class="who__p">Коли немає зрозумілого плану, які вправи вже можна виконувати та як безпечно повертати навантаження.</p>
+<p class="who__p">Коли гострий етап уже минув і фахівець дозволив активне відновлення, але незрозуміло, як поетапно повертати навантаження.</p>
 </div>
 </article>
 <article class="who__card">
 <div class="who__media"><img alt="Тривалий дискомфорт і скутість у коліні" loading="lazy" src="./img/hronic.jpg"/></div>
 <div class="who__body">
 <h3 class="who__h">Тривалий або повторний біль</h3>
-<p class="who__p">При артрозі, скутісті або ситуації, коли мазі, таблетки й фізпроцедури давали лише тимчасове полегшення.</p>
+<p class="who__p">Коли симптоми тривають давно або повертаються після періодів спокою, лікування чи коротких комплексів вправ.</p>
 </div>
 </article>
 <article class="who__card">
 <div class="who__media"><img alt="Повернення до бігу, спорту й активного життя" loading="lazy" src="./img/sport.jpg"/></div>
 <div class="who__body">
 <h3 class="who__h">Активні люди</h3>
-<p class="who__p">Для тих, хто хоче впевненіше ходити, тренуватися, повернутися до бігу, спорту або просто більше рухатися.</p>
+<p class="who__p">Для тих, кому важливо не зупинитися на полегшенні симптомів, а поступово підготувати коліно до залу, бігу, спорту чи активного життя.</p>
 </div>
 </article>
 </div>
 </div>
 </section>
-<section class="why" id="why">
-<div class="why__inner">
-<h2 class="why__title">Чому дискомфорт часто повертається після пасивного лікування</h2>
-<p class="why__lead">Мазі, таблетки, уколи, фізпроцедури або відпочинок можуть тимчасово полегшити симптоми. Але якщо коліно не повернуло силу, контроль і толерантність до навантаження, після повернення до звичного життя дискомфорт нерідко з’являється знову.</p>
-<div class="why__grid">
-<article class="why__card">
-<h3 class="why__h">Таблетки та уколи</h3>
-<p class="why__p">Можуть зменшити біль і запальну реакцію, але самі по собі не повертають м’язову силу, контроль руху та витривалість.</p>
-</article>
-<article class="why__card">
-<h3 class="why__h">Пасивні процедури</h3>
-<p class="why__p">Масаж і фізпроцедури можуть дати полегшення «тут і зараз», однак не замінюють поступової адаптації коліна до навантаження.</p>
-</article>
-<article class="why__card">
-<h3 class="why__h">Випадкові вправи</h3>
-<p class="why__p">Окремі вправи без послідовності можуть бути надто легкими, надто складними або не відповідати поточному етапу відновлення.</p>
-</article>
-<article class="why__card">
-<h3 class="why__h">Лише спокій і фіксація</h3>
-<p class="why__p">Після відпочинку може стати легше, але без повернення сили й рухливості звичне навантаження знову стає надмірним.</p>
-</article>
-<article class="why__card">
-<h3 class="why__h">Надто швидке повернення</h3>
-<p class="why__p">Коли людина одразу повертається до попереднього обсягу ходьби, роботи або тренувань, коліно може бути до цього ще не готове.</p>
-</article>
-</div>
-<div class="why__works">
-<h3 class="why__subtitle">Що допомагає сформувати стійкіший результат</h3>
-<ul class="why__list">
-<li>поетапний перехід від простих вправ до складніших;</li>
-<li>поступове збільшення навантаження замість різкого повернення до активності;</li>
-<li>робота над рухливістю, силою, балансом і контролем руху;</li>
-<li>тести та критерії, які підказують, коли можна переходити до наступного етапу;</li>
-<li>готовий план занять удома з нагадуваннями та PDF-матеріалами.</li>
-</ul>
-<div class="why__cta">
-<a class="btn btn--primary lp-button lp-button--primary" data-scroll-to="#included" href="#included">Подивитися, що входить у курс</a>
-</div>
-</div>
-</div>
-</section>
-
 <section class="included included--alt" id="included">
 <div class="included__inner">
-<h2 class="included__title">Що входить у курс</h2>
-<p class="included__lead">Усе, що потрібно для послідовного відновлення коліна вдома: відеовправи, два етапи, критерії переходу, бонусні пояснення, PDF-плани та нагадування.</p>
+<p class="sales-kicker">Тепер — сам продукт</p><h2 class="included__title">Що ви отримуєте всередині програми</h2>
+<p class="included__lead">Основне вже зібране в готову послідовність: вправи, дозування, етапи та критерії переходу.</p>
 <div class="included__grid">
 <article class="included__card">
 <div class="included__media"><img alt="Вправи у відеоформаті" loading="lazy" src="./img/ex.jpg"/></div>
-<div class="included__body"><h3 class="included__h">70+ відеовправ</h3><p class="included__p">Короткі зрозумілі відео з технікою, кількістю повторень, підходами та варіантами прогресії.</p></div>
+<div class="included__body"><h3 class="included__h">Не потрібно шукати наступну вправу</h3><p class="included__p">70+ коротких відео з технікою, кількістю повторень, підходами та варіантами прогресії.</p></div>
 </article>
 <article class="included__card">
 <div class="included__media"><img alt="Два етапи програми" loading="lazy" src="./img/center1.jpg"/></div>
-<div class="included__body"><h3 class="included__h">2 послідовні етапи</h3><p class="included__p">Від базової рухливості та активації м’язів — до сили, стабільності й активніших навантажень.</p></div>
+<div class="included__body"><h3 class="included__h">Рухаєтеся від простого до складнішого</h3><p class="included__p">Два етапи: від базової рухливості, активації та контролю — до сили, стабільності й активніших навантажень.</p></div>
 </article>
 <article class="included__card">
 <div class="included__media"><img alt="Тести й критерії переходу" loading="lazy" src="./img/diag.jpg"/></div>
-<div class="included__body"><h3 class="included__h">Тести між етапами</h3><p class="included__p">Зрозумілі критерії допомагають оцінити реакцію коліна та визначити, коли переходити до складніших вправ.</p></div>
+<div class="included__body"><h3 class="included__h">Розумієте, коли можна рухатися далі</h3><p class="included__p">Тести й критерії допомагають оцінити реакцію коліна та не форсувати перехід до складніших вправ.</p></div>
 </article>
-<article class="included__card">
-<div class="included__media"><img alt="Шість бонусних відео" loading="lazy" src="./img/teleg.jpg"/></div>
-<div class="included__body"><h3 class="included__h">6 бонусних відео</h3><p class="included__p">Пояснення для найпоширеніших проблем і травм коліна з рекомендаціями щодо використання програми.</p></div>
-</article>
+
 <article class="included__card">
 <div class="included__media"><img alt="PDF-файли для офлайн-доступу" loading="lazy" src="./img/pdf.jpg"/></div>
-<div class="included__body"><h3 class="included__h">PDF-плани</h3><p class="included__p">Готові комплекси можна зберегти на телефон або роздрукувати й виконувати без постійного пошуку в боті.</p></div>
+<div class="included__body"><h3 class="included__h">Маєте план під рукою</h3><p class="included__p">PDF-комплекси можна зберегти на телефон або роздрукувати, щоб не шукати кожну вправу окремо.</p></div>
 </article>
-<article class="included__card">
-<div class="included__media"><img alt="Нагадування про заняття" loading="lazy" src="./img/calendar.jpg"/></div>
-<div class="included__body"><h3 class="included__h">Нагадування</h3><p class="included__p">Щоденні нагадування допомагають не пропускати заняття та зберігати послідовність.</p></div>
-</article>
+
 </div>
 </div>
 </section><section class="program" id="program">
@@ -647,7 +851,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <ul class="program__list">
 <li>м’яка мобілізація, вправи на рухливість;</li>
 <li>вправи на зменшення болю та набряку;</li>
-<li>короткі комплекси, які легко вписати у день.</li>
+<li>короткі комплекси, які легко вписати в день.</li>
 </ul>
 </article>
 </li>
@@ -870,44 +1074,18 @@ document.addEventListener("DOMContentLoaded", function () {
 <p>Привіт! Мене звати Богдан. Я фізичний терапевт з понад 10-річним досвідом роботи з травмами коліна, стопи та хребта.</p>
 <ul class="lp-checks" role="list">
 <li>Понад 2000 пацієнтів уже пройшли мої індивідуальні та онлайн-програми.</li>
-<li>Навчався за міжнародними методиками: Maliggan concept, Maitland, PNF, McKenzie, Thomas Myers (анатомічні поїзди), мануальна терапія.</li>
+<li>Навчався за міжнародними методиками: Mulligan Concept, Maitland, PNF, McKenzie, Thomas Myers (анатомічні поїзди), мануальна терапія.</li>
 <li>Постійно підвищую кваліфікацію, відвідую конференції та навчаюся у провідних спеціалістів.</li>
-<li>Поєдную знання анатомії, біомеханіки та доказових підходів для створення ефективних програм, які реально працюють./li&gt;
-        </li></ul>
-<p>Я створив цей курс, щоб кожен зміг безпечно та ефективно покращити стан стопи, навіть без візиту до клініки. Моя мета — зробити знання та допомогу доступними для кожного.</p>
-</div>
-</div>
-</section>
-<section class="lp-section lp-section--light" id="reviews">
-<div class="lp-shell">
-<div class="lp-heading">
-<p class="lp-kicker">Досвід учасників</p>
-<h2>Відгуки про програму</h2>
-</div>
-<div class="lp-review-grid">
-<figure><img alt="Відгук про заняття та сходи" loading="lazy" src="./img/3.jpg"/></figure>
-<figure><img alt="Відгук про програму вправ" loading="lazy" src="./img/5.jpg"/></figure>
-<figure><img alt="Відгук про вправи для коліна" loading="lazy" src="./img/6.jpg"/></figure>
-<figure><img alt="Відгук про результат програми" loading="lazy" src="./img/8.jpg"/></figure>
-<figure><img alt="Відгук про стабільність і рухливість" loading="lazy" src="./img/9.jpg"/></figure>
-<figure><img alt="Відгук про покрокові вправи" loading="lazy" src="./img/11.jpg"/></figure>
+<li>Поєдную знання анатомії, біомеханіки та доказових підходів, щоб створювати зрозумілі й послідовні програми відновлення.</li>
+</ul>
+<p>Я створив цей курс, щоб дати зрозумілий і послідовний план відновлення коліна вдома. Моя мета — допомогти безпечніше дозувати навантаження та поступово повертатися до звичних рухів.</p>
 </div>
 </div>
 </section>
 <section class="pricing" id="pricing">
 <div class="pricing__inner">
-<h2 class="pricing__title">Обери свій формат</h2>
-<p class="pricing__lead">В обох варіантах ви отримуєте повну програму з усіма вправами, етапами, тестами, PDF-планами та бонусними відео. Формат за 890 грн додатково включає індивідуальні рекомендації автора.</p>
-<div class="lp-countdown lp-countdown--pricing" data-daily-countdown="">
-<p class="lp-countdown__label">До кінця спеціальної пропозиції:</p>
-<div aria-live="off" class="lp-countdown__units" role="timer">
-<div class="lp-countdown__unit"><strong data-countdown-hours="">23</strong><span>год</span></div>
-<span aria-hidden="true" class="lp-countdown__separator">:</span>
-<div class="lp-countdown__unit"><strong data-countdown-minutes="">59</strong><span>хв</span></div>
-<span aria-hidden="true" class="lp-countdown__separator">:</span>
-<div class="lp-countdown__unit"><strong data-countdown-seconds="">59</strong><span>сек</span></div>
-</div>
-</div>
+<h2 class="pricing__title">Почніть з того рівня підтримки, який потрібен вам</h2>
+<p class="pricing__lead">Доступ відкривається одразу після оплати — чекати окремого «старту потоку» не потрібно. Обидва формати містять повну програму; за 890 грн додатково ви отримуєте персональний розбір стартової ситуації.</p>
 <div class="pricing__grid">
 <article class="pricing__card">
 <div class="pricing__head"><h3 class="pricing__name">Курс «Відновлення коліна»</h3></div>
@@ -920,7 +1098,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <li>доступ до повної програми у Telegram-боті</li>
 </ul>
 <div class="pricing__actions">
-<a class="btn btn--primary pricing__btn pay-btn" data-product-id="knee_390" href="#">Придбати курс за 390 грн</a>
+<a class="btn btn--primary pricing__btn pay-btn" data-product-id="knee_390" href="#">Почати програму за 390 грн</a>
 <p class="pricing__note">14 днів гарантії повернення коштів</p>
 </div>
 </article>
@@ -936,7 +1114,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <li>переписка й голосові повідомлення у Telegram</li>
 </ul>
 <div class="pricing__actions">
-<a class="btn btn--primary pricing__btn pay-btn" data-product-id="knee_890" href="#">Придбати з рекомендаціями за 890 грн</a>
+<a class="btn btn--primary pricing__btn pay-btn" data-product-id="knee_890" href="#">Отримати програму + рекомендації</a>
 <p class="pricing__note">Формат без дзвінків — у зручний для вас час</p>
 </div>
 </article>
@@ -952,7 +1130,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <div class="lp-shell lp-faq">
 <div class="lp-heading lp-heading--light">
 <p class="lp-kicker">Поширені запитання</p>
-<h2>Що важливо знати перед початком</h2>
+<h2>Що важливо знати перед початком</h2><p>Якщо у вас залишилося питання про діагноз, навантаження, формат або доступ — найчастіші відповіді зібрані нижче.</p>
 </div>
 <div class="bs-faq__list" data-faq="">
 <div class="bs-faq__item"><button aria-controls="faq-a1" aria-expanded="false" class="bs-faq__q" id="faq-q1" type="button">Чи потрібен точний діагноз перед початком?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q1" class="bs-faq__a" id="faq-a1" role="region"><div class="bs-faq__a-inner">Для самостійного проходження важливо розуміти загальний стан і обмеження, але точна назва діагнозу не завжди визначає вибір кожної вправи. Якщо травма свіжа, є значний набряк, блокування руху, неможливість спертися на ногу або сумніви щодо безпеки навантаження — спочатку зверніться до лікаря чи фізичного терапевта.</div></div></div>
@@ -982,11 +1160,11 @@ document.addEventListener("DOMContentLoaded", function () {
 <div class="lp-shell lp-footer__grid">
 <div><p>ФОП Латиш Богдан Вячеславович<br/>ЄДРПОУ 3392515210</p></div>
 <div><h3>Контакти</h3><a href="mailto:bog.rehab@gmail.com">bog.rehab@gmail.com</a><a href="https://t.me/bogdanrehab" rel="noopener" target="_blank">Telegram</a><a href="https://www.instagram.com/bogdan.rehab" rel="noopener" target="_blank">Instagram</a></div>
-<div><h3>Документи</h3><a href="/knee/privacy/">Політика конфіденційності</a><a href="/knee/offer/">Публічна оферта</a></div>
+<div><h3>Документи</h3><a href="/privacy/">Політика конфіденційності</a><a href="/offer/">Публічна оферта</a></div>
 </div>
 <div class="lp-shell lp-footer__bottom">© 2026 Bogdan Rehab</div>
 </footer>
-<a aria-label="Перейти до вибору формату" class="lp-sticky-cta" data-scroll-to="#pricing" href="#pricing">Приєднатися зараз</a>
+<a aria-label="Перейти до вибору формату" class="lp-sticky-cta" data-scroll-to="#pricing" href="#pricing">390 грн • Почати програму</a>
 <script src="./knee.js"></script>
 </body>
 </html>

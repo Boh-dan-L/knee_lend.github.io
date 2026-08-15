@@ -89,34 +89,24 @@
 })();
 
 
-/* Synchronized daily countdown to the next local midnight */
+
+
+/* V10: subtle one-time reveal for persuasion blocks */
 (() => {
-  const countdowns = [...document.querySelectorAll('[data-daily-countdown]')];
-  if (!countdowns.length) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const pad = (value) => String(value).padStart(2, '0');
+  const nodes = [...document.querySelectorAll('[data-reveal]')];
+  if (!nodes.length || !('IntersectionObserver' in window)) return;
 
-  const render = () => {
-    const now = new Date();
-    const nextMidnight = new Date(now);
-    nextMidnight.setHours(24, 0, 0, 0);
+  document.documentElement.classList.add('v10-reveal-ready');
 
-    const totalSeconds = Math.max(0, Math.floor((nextMidnight.getTime() - now.getTime()) / 1000));
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-
-    countdowns.forEach((countdown) => {
-      const hoursNode = countdown.querySelector('[data-countdown-hours]');
-      const minutesNode = countdown.querySelector('[data-countdown-minutes]');
-      const secondsNode = countdown.querySelector('[data-countdown-seconds]');
-
-      if (hoursNode) hoursNode.textContent = pad(hours);
-      if (minutesNode) minutesNode.textContent = pad(minutes);
-      if (secondsNode) secondsNode.textContent = pad(seconds);
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-visible');
+      observer.unobserve(entry.target);
     });
-  };
+  }, { threshold: 0.12, rootMargin: '0px 0px -5% 0px' });
 
-  render();
-  window.setInterval(render, 1000);
+  nodes.forEach((node) => observer.observe(node));
 })();

@@ -4,8 +4,19 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Дякуємо — доступ до програми</title>
-  <link rel="stylesheet" href="../../shared/css/base.css">
-  <link rel="stylesheet" href="../knee.css">
+  <link rel="stylesheet" href="../shared/css/base.css">
+  <link rel="stylesheet" href="../shared/css/thank-you.css">
+<script>
+  window.APP_CONFIG = {
+    landing_id: "knee-thank-you-390",
+    pixel_key: "pixel_knee"
+  };
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    landing_id: window.APP_CONFIG.landing_id,
+    pixel_key: window.APP_CONFIG.pixel_key
+  });
+</script>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -27,24 +38,37 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
 </script>
 <!-- TikTok Pixel Code End -->
 </head>
-<body>
+<body class="thankyou-page thankyou-page--390">
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TPZT7VDW"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
-  <main class="thankyou">
-    <div class="thankyou__box container">
-      <h1 class="thankyou__title">🎉 Дякуємо за покупку!</h1>
-      <p class="thankyou__text">
-        Натисніть кнопку нижче, щоб отримати доступ до програми.
-      </p>
-      <a class="btn btn--primary" href="https://t.me/Knee2Rehab_bot?start=26kneebot">
-        Перейти до програми
-      </a>
-    </div>
+  <main class="thankyou" aria-labelledby="thankyou-title">
+    <span class="thankyou__glow thankyou__glow--one" aria-hidden="true"></span>
+    <span class="thankyou__glow thankyou__glow--two" aria-hidden="true"></span>
+    <section class="thankyou__card thankyou__card--compact">
+      <div class="thankyou__status">
+        <span class="thankyou__status-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7 12.5 10.2 16 17.5 8.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span>Оплату успішно отримано</span>
+      </div>
+      <div class="thankyou__intro">
+        <p class="thankyou__eyebrow">Курс «Відновлення коліна»</p>
+        <h1 class="thankyou__title" id="thankyou-title">Дякуємо за покупку!</h1>
+        <p class="thankyou__text">Доступ до програми вже відкрито. Залишився один крок — перейдіть у Telegram, щоб розпочати.</p>
+      </div>
+      <div class="thankyou__next">
+        <span class="thankyou__next-icon" aria-hidden="true">1</span>
+        <div><h2>Перейдіть до програми в Telegram</h2><p>Після переходу натисніть «Start / Розпочати» — бот відкриє меню програми та перший етап.</p></div>
+      </div>
+      <div class="thankyou__actions">
+        <a class="thankyou__button" href="https://t.me/Knee2Rehab_bot?start=26kneebot"><span>Перейти до програми</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <p class="thankyou__note">Доступ відкривається одразу після оплати.</p>
+      </div>
+      <div class="thankyou__support"><span>Виникли труднощі?</span><a href="https://t.me/bogdanrehab" target="_blank" rel="noopener noreferrer">Напишіть у Telegram</a></div>
+    </section>
   </main>
-  <footer class="footer">© Bogdan Rehab</footer>
+  <footer class="thankyou-footer">© 2026 Bogdan Rehab</footer>
   <script>
   </script>
   <script>
@@ -66,6 +90,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({
     event: "meta_purchase",
+    landing_id: window.APP_CONFIG?.landing_id || null,
+    pixel_key: window.APP_CONFIG?.pixel_key || null,
     purchase: {
       event_id: eventId,
       order_ref: orderRef,
