@@ -1,19 +1,40 @@
 
 /* knee.css */
 :root{
-  --c-bgk: radial-gradient(120% 140% at 100% 0%, rgba(22, 57, 100, .14) 0%, transparent 60%), linear-gradient(180deg,
- color-mix(in oklab, var(--tone-mid, #0e274d) 92%, black 8%) 0%,
- color-mix(in oklab, var(--tone-soft, #163964) 92%, black 8%) 100%);;
-  --c-white: #ffffff;
+  /* =========================================================
+     ЄДИНА ПАЛІТРА САЙТУ — змінюйте кольори тут
+     ========================================================= */
+  --theme-deep: #020d24;          /* головний темний фон із Hero */
+  --theme-deep-2: #021934;        /* другий темний відтінок */
+  --theme-mid: #0e2d55;           /* синій для темних карток */
+  --theme-soft-blue: #eef4fa;     /* світло-синій фон секцій */
+  --theme-page: #f6f8fb;          /* основний світлий фон */
+  --theme-surface: #ffffff;       /* картки */
+  --theme-text: #102342;          /* основний текст на світлому */
+  --theme-muted: #5d6d82;         /* другорядний текст */
+  --theme-border: #dce5ef;        /* межі карток */
+  --theme-accent: #ffc226;        /* жовтий акцент із Hero */
+  --theme-accent-text: #805700;   /* темний текст на жовтих акцентах */
+  --theme-cta: #ff7a00;           /* УСІ основні кнопки */
+  --theme-cta-hover: #e66e00;     /* hover кнопок */
+  --theme-success: #2fb64a;       /* галочки */
+  --theme-white: #ffffff;
+  --theme-shadow: 0 14px 34px rgba(2, 25, 52, .10);
+  --theme-deep-gradient: radial-gradient(circle at 86% 8%, rgba(74,163,255,.18), transparent 30%), linear-gradient(145deg, var(--theme-deep) 0%, var(--theme-mid) 100%);
+  --theme-hero-gradient: radial-gradient(circle at 78% 18%, rgba(28,94,160,.75), transparent 28%), radial-gradient(circle at 55% 55%, rgba(10,62,110,.45), transparent 45%), linear-gradient(180deg, var(--theme-deep) 0%, var(--theme-deep-2) 45%, #011123 100%);
+
+  /* aliases for older components */
+  --c-bgk: var(--theme-deep-gradient);
+  --c-white: var(--theme-white);
   --c-text: #D6EEF1;
-  --c-accent: #F0B429;
-  --c-orange: #FF7A00;
-  --c-orange-dark: #E66E00;
-  --tone-deep: #0b1d3a;   /* темна база, синьо-індиго */
-  --tone-mid:  #0e274d;   /* середній відтінок */
-  --tone-soft: #163964;   /* м'якший синій для переходів */
-  --tone-blue: #4aa3ff;   /* «світлова смуга» зліва */
-  --accent:    #F0B429;   /* акцент для виділень/ціни */
+  --c-accent: var(--theme-accent);
+  --c-orange: var(--theme-cta);
+  --c-orange-dark: var(--theme-cta-hover);
+  --tone-deep: var(--theme-deep);
+  --tone-mid: var(--theme-deep-2);
+  --tone-soft: var(--theme-mid);
+  --tone-blue: #4aa3ff;
+  --accent: var(--theme-accent);
   --radius: 14px;
   --container: 1120px;
   --ff-base: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
@@ -2003,7 +2024,7 @@ img{ max-width:100%; height:auto; }
 .included__inner{ max-width: var(--container, 1120px); margin: 0 auto; }
 
 .included__title{
-  color:#2b3d43;
+  color:#fff;
   margin: 0 0 8px;
   font-weight: 800;
   font-size: clamp(22px, 4.6vw, 32px);
@@ -2012,7 +2033,7 @@ img{ max-width:100%; height:auto; }
 .included__lead{
   margin: 0 0 20px;
   font-size: 16px;
-  color: #444;
+  color: #fff;
   max-width: 860px;
 }
 
@@ -2801,6 +2822,7 @@ body.landing-v4 a {
   padding: 14px 14px 14px 45px;
   border-radius: 12px;
   background: #f5f7fa;
+  color: black;
 }
 
 .lp-example-card li::before {
@@ -5032,4 +5054,247 @@ body.landing-v4 .lp-pricing-card h3 {
   .sales-proof__inner--four .sales-proof__item { padding: 9px 8px; }
   .sales-proof__inner--four .sales-proof__item:nth-child(3) { border-left: 0; border-top: 1px solid #e2e8eb; }
   .sales-proof__inner--four .sales-proof__item:nth-child(4) { border-top: 1px solid #e2e8eb; }
+}
+
+
+/* =========================================================
+   KNEE6 — UNIFIED THEME OVERRIDES
+   Усі кольори нижче посилаються на змінні у :root.
+   ========================================================= */
+body.landing-v4 { background: var(--theme-page); color: var(--theme-text); }
+.hero-knee { background: var(--theme-hero-gradient); }
+.hero-knee__title span,
+.hero-knee__subtitle strong,
+.hero-knee__price strong,
+.sales-kicker,
+.lp-kicker,
+.lp-card-label,
+.gr-knee-bonus-modules__eyebrow,
+.gr-knee-bonus-modules__note { color: var(--theme-accent) !important; }
+
+/* One CTA color everywhere */
+.hero-knee__btn--primary,
+.btn--primary,
+.lp-button--primary,
+.lp-button--contrast,
+.pricing .btn--primary,
+.pricing__card--pro .pricing__btn,
+.lp-sticky-cta {
+  background: var(--theme-cta) !important;
+  border-color: var(--theme-cta) !important;
+  color: var(--theme-white) !important;
+  box-shadow: 0 10px 24px rgba(255,122,0,.22);
+}
+.hero-knee__btn--primary:hover,
+.btn--primary:hover,
+.lp-button--primary:hover,
+.lp-button--contrast:hover,
+.pricing .btn--primary:hover,
+.lp-sticky-cta:hover { background: var(--theme-cta-hover) !important; filter: none !important; }
+
+/* Light sections */
+.sales-proof,
+.who--alt,
+.program,
+.exercise-gap,
+.lp-section--light,
+.gr-knee-bonus-modules,
+.pricing,
+.lp-section--guarantee { background: var(--theme-page) !important; color: var(--theme-text) !important; }
+.included--alt { background: var(--theme-deep-gradient) !important; }
+.rehab-story { background: var(--theme-surface) !important; color: var(--theme-text) !important; }
+
+/* Cards and text */
+.who__card,
+.program__card,
+.exercise-gap__questions,
+.exercise-gap__answers,
+.lp-review-grid figure,
+.lp-example-card,
+.pricing__card,
+.lp-guarantee,
+.sales-proof__inner,
+.gr-knee-bonus-modules__footer {
+  border-color: var(--theme-border) !important;
+  background: var(--theme-surface) !important;
+  box-shadow: var(--theme-shadow);
+}
+.sales-title,
+.who__title,
+.who__h,
+.program__title,
+.program__h,
+.exercise-gap__heading h2,
+.exercise-gap__questions h3,
+.exercise-gap__answers h3,
+.lp-heading h2,
+.lp-author h2,
+.pricing__title,
+.pricing__name,
+.lp-guarantee h2 { color: var(--theme-text) !important; }
+.sales-lead,
+.who__p,
+.who__note,
+.program__lead,
+.program__list,
+.exercise-gap__heading .sales-lead,
+.exercise-gap__questions li,
+.exercise-gap__answers li span,
+.lp-heading > p:last-child,
+.pricing__lead,
+.pricing__list li,
+.lp-guarantee p:not(.lp-card-label) { color: var(--theme-muted) !important; }
+
+/* Dark sections */
+.lp-section--deep,
+#personal.lp-section--accent,
+.lp-footer { background: var(--theme-deep-gradient) !important; color: var(--theme-white) !important; }
+#personal .lp-kicker,
+#personal .lp-personal__content h2 { color: var(--theme-white) !important; }
+#personal .lp-personal__lead,
+#personal .lp-checks li,
+#personal .lp-format-note p { color: rgba(255,255,255,.82) !important; }
+#personal .lp-format-note { border-color: rgba(255,255,255,.17) !important; background: rgba(255,255,255,.07) !important; }
+#personal .lp-format-note strong { color: var(--theme-accent) !important; }
+#personal .lp-personal .lp-checks li::before { background: var(--theme-accent) !important; color: var(--theme-deep) !important; }
+
+/* Bonus cards keep the same navy language */
+.gr-knee-bonus-modules__card { background: var(--theme-deep-gradient) !important; }
+.gr-knee-bonus-modules__image-wrap { background: var(--theme-soft-blue) !important; }
+.gr-knee-bonus-modules__title { color: var(--theme-text) !important; }
+.gr-knee-bonus-modules__text { color: var(--theme-muted) !important; }
+
+/* Pricing */
+.pricing__card--pro { background: var(--theme-deep-gradient) !important; border-color: var(--theme-mid) !important; }
+.pricing__card--pro .pricing__name,
+.pricing__card--pro .pricing__list li,
+.pricing__card--pro .pricing__currency,
+.pricing__card--pro .pricing__note { color: var(--theme-white) !important; }
+.pricing__badge { background: var(--theme-accent) !important; color: var(--theme-deep) !important; }
+.pricing__amount.accent { color: var(--theme-accent) !important; }
+.pricing__trust { color: var(--theme-muted) !important; }
+.pricing__trust span::before { background: var(--theme-accent) !important; box-shadow: none !important; }
+
+/* WHY: clear pain-return cycle */
+.pain-cycle {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  align-items: stretch;
+  gap: 10px;
+  margin-top: 30px;
+}
+.pain-cycle > i { display: grid; place-items: center; color: var(--theme-accent-text); font-size: 24px; font-style: normal; font-weight: 900; }
+.pain-cycle__step {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  min-height: 118px;
+  padding: 18px;
+  border: 1px solid var(--theme-border);
+  border-radius: 18px;
+  background: var(--theme-surface);
+  text-align: center;
+  box-shadow: var(--theme-shadow);
+}
+.pain-cycle__step strong { display: grid; width: 30px; height: 30px; margin: 0 auto; place-items: center; border-radius: 50%; background: var(--theme-deep); color: var(--theme-accent); }
+.pain-cycle__step span { color: var(--theme-text); font-size: 14px; font-weight: 800; line-height: 1.4; }
+.pain-cycle__step--accent { border-color: rgba(255,122,0,.38); background: #fff7ef; }
+.rehab-story__common { background: var(--theme-deep-gradient) !important; }
+.rehab-story__common .sales-kicker { color: var(--theme-accent) !important; }
+
+/* Program + Telegram merged block */
+.program-preview {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(320px, 1.1fr);
+  gap: 32px;
+  align-items: center;
+  margin-top: 34px;
+  padding: 32px;
+  border: 1px solid var(--theme-border);
+  border-radius: 24px;
+  background: var(--theme-soft-blue);
+  box-shadow: var(--theme-shadow);
+}
+.program-preview__copy h3 { margin: 0; color: var(--theme-text); font-size: clamp(25px, 3.4vw, 38px); line-height: 1.15; }
+.program-preview__copy > p:not(.sales-kicker) { color: var(--theme-muted); line-height: 1.7; }
+.program-preview__list { display: grid; gap: 10px; margin: 20px 0 0; padding: 0; list-style: none; }
+.program-preview__list li { position: relative; padding-left: 28px; color: var(--theme-text); font-size: 14px; font-weight: 700; }
+.program-preview__list li::before { position: absolute; left: 0; top: 0; color: var(--theme-success); content: "✓"; font-weight: 900; }
+.program-preview__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 24px; }
+.program-preview__actions span { color: var(--theme-muted); font-size: 13px; font-weight: 700; }
+.product-preview__media { border-color: rgba(2,25,52,.14) !important; background: var(--theme-deep) !important; }
+
+/* Strong YouTube vs course comparison */
+.exercise-gap__comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+.exercise-gap__questions,
+.exercise-gap__answers { padding: 28px; border: 1px solid var(--theme-border); border-radius: 22px; }
+.exercise-gap__questions { background: var(--theme-surface) !important; }
+.exercise-gap__answers { background: var(--theme-soft-blue) !important; }
+.exercise-gap__questions ul,
+.exercise-gap__answers ul { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.exercise-gap__questions li { position: relative; padding-left: 30px; }
+.exercise-gap__questions li::before { position: absolute; left: 0; top: 1px; display: grid; width: 20px; height: 20px; place-items: center; border-radius: 50%; background: var(--theme-deep); color: var(--theme-accent); content: "?"; font-size: 12px; font-weight: 900; }
+.exercise-gap__answers li { display: grid; gap: 4px; padding-left: 28px; position: relative; }
+.exercise-gap__answers li::before { position: absolute; left: 0; top: 0; color: var(--theme-success); content: "✓"; font-weight: 900; }
+.exercise-gap__answers li strong { color: var(--theme-text); font-size: 15px; }
+.exercise-gap__answers li span { font-size: 14px; line-height: 1.5; }
+.exercise-gap__claim--strong { margin-top: 22px; padding: 24px; border: 0; border-radius: 20px; background: var(--theme-deep-gradient); text-align: center; }
+.exercise-gap__claim--strong strong { color: var(--theme-white) !important; font-size: 22px; }
+.exercise-gap__claim--strong span { color: var(--theme-accent) !important; font-size: 17px; }
+
+/* Reviews */
+.lp-heading--compact { margin-bottom: 28px; }
+.lp-section--reviews-early { background: var(--theme-soft-blue) !important; }
+.lp-review-grid--early { max-width: 980px; margin: 0 auto; }
+.lp-review-grid figure { overflow: hidden; border: 1px solid var(--theme-border); border-radius: 18px; }
+.lp-review-grid figure img { display: block; width: 100%; height: auto; }
+
+@media (max-width: 820px) {
+  .pain-cycle { grid-template-columns: 1fr; }
+  .pain-cycle > i { transform: rotate(90deg); }
+  .pain-cycle__step { min-height: 0; }
+  .program-preview,
+  .exercise-gap__comparison { grid-template-columns: 1fr; }
+  .program-preview { padding: 22px 18px; }
+  .program-preview .product-preview__media { order: -1; }
+  .program-preview__actions { display: grid; }
+  .program-preview__actions .btn { width: 100%; }
+  .program-preview__actions span { text-align: center; }
+}
+
+@media (max-width: 640px) {
+  .hero-knee__title { max-width: 82%; font-size: 31px; }
+  .hero-knee__subtitle { max-width: 88%; }
+  .exercise-gap__questions,
+  .exercise-gap__answers { padding: 22px 19px; }
+  .pricing__grid { gap: 28px; }
+}
+
+/* Contrast refinements for the unified palette */
+.who .sales-kicker,
+.rehab-story .sales-kicker,
+.program > .program__inner > .sales-kicker,
+.exercise-gap .sales-kicker,
+.pricing > .pricing__inner > .sales-kicker,
+.lp-section--light .lp-kicker,
+.gr-knee-bonus-modules__eyebrow,
+.lp-section--guarantee .lp-card-label {
+  color: var(--theme-accent-text) !important;
+}
+.included--alt .sales-kicker,
+.program-preview .sales-kicker,
+.rehab-story__common .sales-kicker,
+#personal .lp-kicker,
+.lp-section--deep .lp-kicker {
+  color: var(--theme-accent) !important;
+}
+#author .lp-author h2,
+#author .lp-author__content,
+#author .lp-author__content p,
+#author .lp-checks li,
+.lp-section--deep .lp-heading h2 {
+  color: var(--theme-white) !important;
+}
+.lp-section--deep .lp-heading > p:last-child {
+  color: rgba(255,255,255,.72) !important;
 }
