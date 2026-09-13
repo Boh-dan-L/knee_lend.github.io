@@ -9,8 +9,8 @@
 - Додано окремий блок про індивідуальні рекомендації від автора програми.
 - Чітко зазначено формат: переписка та голосові повідомлення у Telegram, без дзвінків.
 - Додано окремі реальні скріншоти відгуків після персональних рекомендацій.
-- Тариф за 890 грн позначено як «Найчастіше обирають».
-- Збережено наявну платіжну логіку та `data-product-id`: `knee_390` і `knee_890`.
+- Тариф за 1090 грн позначено як «Найчастіше обирають».
+- Збережено наявну платіжну логіку та `data-product-id`: `knee_590` і `knee_1090`.
 - GTM-контейнер і логіку атрибуції не змінено.
 
 ## Перед публікацією
@@ -50,7 +50,7 @@
 - Added a separate six-module bonus section with zone-based visual cues.
 - Updated the individual-recommendations introduction.
 - Removed “most popular” emphasis and equalized the two pricing cards.
-- Kept payment product IDs unchanged: `knee_390` and `knee_890`.
+- Kept payment product IDs unchanged: `knee_590` and `knee_1090`.
 
 
 ## Version 10 — persuasion architecture

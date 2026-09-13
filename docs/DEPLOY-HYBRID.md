@@ -7,7 +7,7 @@
 - GTM: `GTM-TPZT7VDW`
 - Server pixel route: `pixel_knee`
 - `landing_id`: `knee`
-- Product IDs: `knee_390`, `knee_890`
+- Product IDs: `knee_590`, `knee_1090`
 - Browser `meta_initiate_checkout` через dataLayer + server CAPI `/checkout` з однаковим `checkout_event_id` для дедуплікації.
 - Purchase на thank-you сторінках: `meta_purchase` з `event_id` + `order_ref`, захист від повторного fire при F5.
 
