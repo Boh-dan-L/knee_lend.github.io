@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+
+<html lang="uk">
+<head>
+<meta charset="utf-8"/>
+<meta content="Домашня програма вправ для коліна з окремим відео про проходження при артрозі. Готове дозування, 2 етапи та тести. Від 590 грн." name="description"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Вправи для коліна при артрозі — Богдан Латиш</title>
+<link href="./knee.css?v=14" rel="stylesheet"/>
+<link crossorigin="" href="https://bayer-1078313683185.europe-west1.run.app" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&amp;display=swap" rel="stylesheet"/>
+<script>
+  window.APP_CONFIG = {
+    landing_id: "knee",
+    pixel_key: "pixel_knee"
+  };
+
+  // Доступно GTM ще до завантаження контейнера.
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    landing_id: window.APP_CONFIG.landing_id,
+    pixel_key: window.APP_CONFIG.pixel_key
+  });
+</script>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-TPZT7VDW');</script>
+<!-- End Google Tag Manager -->
+<script>
+(function () {
+  function getParam(name) {
+    return new URLSearchParams(window.location.search).get(name);
+  }
+
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp("(^|;\\s*)" + name + "=([^;]+)"));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+
+  function uuidv4() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === "x" ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  function getLS(key) {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function setLS(key, value) {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {}
+  }
+
+  function saveIfExists(key, value) {
+    if (value !== null && value !== undefined && value !== "") {
+      setLS(key, value);
+    }
+  }
+
+  function ensureExternalId() {
+    let id = getLS("meta_external_id");
+    if (!id) {
+      id = uuidv4();
+      setLS("meta_external_id", id);
+    }
+    return id;
+  }
+
+  function updateStoredMetaCookies() {
+    const currentFbp = getCookie("_fbp");
+    const currentFbc = getCookie("_fbc");
+
+    if (currentFbp && currentFbp !== getLS("meta_fbp")) {
+      setLS("meta_fbp", currentFbp);
+    }
+
+    // Передаємо справжній _fbc без змін. Його creationTime уже в мілісекундах.
+    if (currentFbc && currentFbc !== getLS("meta_fbc")) {
+      setLS("meta_fbc", currentFbc);
+    }
+  }
+
+  function waitForMetaCookies(retries, delay) {
+    updateStoredMetaCookies();
+
+    const hasFbp = !!getLS("meta_fbp");
+    const hasFbcOrNoClick = !!getLS("meta_fbc") || !getParam("fbclid");
+    if (hasFbp && hasFbcOrNoClick) return;
+
+    if (retries > 0) {
+      setTimeout(function () {
+        waitForMetaCookies(retries - 1, delay);
+      }, delay);
+    }
+  }
+
+  const utm = {
+    utm_source: getParam("utm_source"),
+    utm_medium: getParam("utm_medium"),
+    utm_campaign: getParam("utm_campaign"),
+    utm_adset: getParam("utm_adset"),
+    utm_content: getParam("utm_content"),
+    utm_term: getParam("utm_term")
+  };
+
+  const fbclid = getParam("fbclid");
+  // ВАЖЛИВО: Meta fbc creationTime працює в мілісекундах. Не ділити Date.now() на 1000.
+  const nowTs = String(Date.now());
+
+  ensureExternalId();
+
+  updateStoredMetaCookies();
+  waitForMetaCookies(15, 300);
+
+  const hasAttributionInUrl =
+    Object.values(utm).some(Boolean) || !!fbclid;
+
+  // FIRST TOUCH
+  if (!getLS("meta_first_seen_at") && hasAttributionInUrl) {
+    setLS("meta_first_seen_at", nowTs);
+
+    saveIfExists("meta_first_utm_source", utm.utm_source);
+    saveIfExists("meta_first_utm_medium", utm.utm_medium);
+    saveIfExists("meta_first_utm_campaign", utm.utm_campaign);
+    saveIfExists("meta_first_utm_adset", utm.utm_adset);
+    saveIfExists("meta_first_utm_content", utm.utm_content);
+    saveIfExists("meta_first_utm_term", utm.utm_term);
+    saveIfExists("meta_first_fbclid", fbclid);
+  }
+
+  // Якщо first_seen_at ще нема взагалі — створи базовий timestamp
+  if (!getLS("meta_first_seen_at")) {
+    setLS("meta_first_seen_at", nowTs);
+  }
+
+  // Окремо зберігаємо точний час отримання fbclid.
+  // Саме цей timestamp використовується як creationTime для fbc.
+  if (fbclid) {
+    if (!getLS("meta_first_fbclid")) {
+      setLS("meta_first_fbclid", fbclid);
+      setLS("meta_first_fbclid_seen_at", nowTs);
+    }
+
+    setLS("meta_last_fbclid", fbclid);
+    setLS("meta_last_fbclid_seen_at", nowTs);
+  }
+
+  // LAST TOUCH
+  if (hasAttributionInUrl) {
+    setLS("meta_last_seen_at", nowTs);
+
+    saveIfExists("meta_last_utm_source", utm.utm_source);
+    saveIfExists("meta_last_utm_medium", utm.utm_medium);
+    saveIfExists("meta_last_utm_campaign", utm.utm_campaign);
+    saveIfExists("meta_last_utm_adset", utm.utm_adset);
+    saveIfExists("meta_last_utm_content", utm.utm_content);
+    saveIfExists("meta_last_utm_term", utm.utm_term);
+    saveIfExists("meta_last_fbclid", fbclid);
+  }
+
+  console.log("ATTR INIT", {
+    external_id: getLS("meta_external_id"),
+    fbp: getLS("meta_fbp"),
+    fbc: getLS("meta_fbc"),
+    first: {
+      seen_at: getLS("meta_first_seen_at"),
+      fbclid: getLS("meta_first_fbclid"),
+      utm_source: getLS("meta_first_utm_source"),
+      utm_medium: getLS("meta_first_utm_medium"),
+      utm_campaign: getLS("meta_first_utm_campaign"),
+      utm_adset: getLS("meta_first_utm_adset"),
+      utm_content: getLS("meta_first_utm_content"),
+      utm_term: getLS("meta_first_utm_term")
+    },
+    last: {
+      seen_at: getLS("meta_last_seen_at"),
+      fbclid: getLS("meta_last_fbclid"),
+      utm_source: getLS("meta_last_utm_source"),
+      utm_medium: getLS("meta_last_utm_medium"),
+      utm_campaign: getLS("meta_last_utm_campaign"),
+      utm_adset: getLS("meta_last_utm_adset"),
+      utm_content: getLS("meta_last_utm_content"),
+      utm_term: getLS("meta_last_utm_term")
+    }
+  });
+})();
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const API_URL = "https://bayer-1078313683185.europe-west1.run.app";
+  const buttons = document.querySelectorAll(".pay-btn");
+  const PAGE_LOADED_AT_MS = Date.now();
+
+  if (!buttons.length) return;
+
+  function uuidv4() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === "x" ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  function getLS(key) {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function getNavigationMetrics() {
+    const nav = performance.getEntriesByType?.("navigation")?.[0];
+    if (!nav) return null;
+
+    return {
+      dom_content_loaded_ms: Math.round(nav.domContentLoadedEventEnd),
+      load_event_ms: Math.round(nav.loadEventEnd),
+      response_end_ms: Math.round(nav.responseEnd)
+    };
+  }
+
+  function buildAttributionPayload() {
+    return {
+      external_id: getLS("meta_external_id"),
+      fbp: getLS("meta_fbp"),
+      fbc: getLS("meta_fbc"),
+      fbclid: getLS("meta_last_fbclid") || getLS("meta_first_fbclid") || null,
+      fbclid_seen_at: Number(
+        getLS("meta_last_fbclid_seen_at") ||
+        getLS("meta_first_fbclid_seen_at")
+      ) || null,
+      utm_source: getLS("meta_last_utm_source") || getLS("meta_first_utm_source") || null,
+      utm_medium: getLS("meta_last_utm_medium") || getLS("meta_first_utm_medium") || null,
+      utm_campaign: getLS("meta_last_utm_campaign") || getLS("meta_first_utm_campaign") || null,
+      utm_adset: getLS("meta_last_utm_adset") || getLS("meta_first_utm_adset") || null,
+      utm_content: getLS("meta_last_utm_content") || getLS("meta_first_utm_content") || null,
+      utm_term: getLS("meta_last_utm_term") || getLS("meta_first_utm_term") || null,
+      first_seen_at: Number(getLS("meta_first_seen_at")) || null,
+      last_seen_at: Number(getLS("meta_last_seen_at")) || null
+    };
+  }
+
+  function trackDiagnostic(eventName, details) {
+    const payload = {
+      event_name: eventName,
+      session_id: getLS("meta_external_id"),
+      landing_id: window.APP_CONFIG?.landing_id || null,
+      pixel_key: window.APP_CONFIG?.pixel_key || null,
+      page_url: window.location.origin + window.location.pathname,
+      client_event_time_ms: Date.now(),
+      attribution: buildAttributionPayload(),
+      details: details || {}
+    };
+
+    try {
+      const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(API_URL + "/track", blob);
+        return;
+      }
+    } catch (error) {
+      console.warn("sendBeacon unavailable:", error);
+    }
+
+    fetch(API_URL + "/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      keepalive: true
+    }).catch(function () {});
+  }
+
+  let warmupStarted = false;
+
+  function warmPaymentService(reason) {
+    if (warmupStarted) return;
+    warmupStarted = true;
+
+    const startedAt = performance.now();
+
+    fetch(API_URL + "/health", {
+      method: "GET",
+      cache: "no-store",
+      mode: "cors"
+    })
+      .then(function (response) {
+        console.log("payment service warm-up:", reason, Math.round(performance.now() - startedAt), "ms", response.status);
+      })
+      .catch(function (error) {
+        console.warn("payment service warm-up failed:", error);
+        warmupStarted = false;
+      });
+  }
+
+  window.setTimeout(function () {
+    warmPaymentService("page-load");
+  }, 800);
+
+  buttons.forEach(function (button) {
+    ["pointerenter", "touchstart", "focus"].forEach(function (eventName) {
+      button.addEventListener(eventName, function () {
+        warmPaymentService(eventName);
+      }, { once: true, passive: true });
+    });
+  });
+
+  function pushBrowserCheckoutEvent(checkoutEventId, orderReference, value, currency) {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "meta_initiate_checkout",
+      checkout: {
+        event_id: checkoutEventId,
+        order_ref: orderReference,
+        value: Number(value) || 0,
+        currency: currency || "UAH"
+      }
+    });
+  }
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener("click", async function (e) {
+      e.preventDefault();
+
+      const originalText = btn.textContent;
+      const purchaseEventId = uuidv4();
+      const checkoutEventId = uuidv4();
+      const clickedAtMs = Date.now();
+      const productId = btn.dataset.productId;
+
+      trackDiagnostic("payment_button_clicked", {
+        product_id: productId,
+        checkout_event_id: checkoutEventId,
+        purchase_event_id: purchaseEventId,
+        page_loaded_at_ms: PAGE_LOADED_AT_MS,
+        time_on_page_before_click_ms: clickedAtMs - PAGE_LOADED_AT_MS,
+        navigation: getNavigationMetrics()
+      });
+
+      const payload = {
+        event_id: purchaseEventId,
+        purchase_event_id: purchaseEventId,
+        checkout_event_id: checkoutEventId,
+        landing_id: window.APP_CONFIG?.landing_id || null,
+        pixel_key: window.APP_CONFIG?.pixel_key || null,
+        product_id: productId,
+        event_source_url: window.location.href,
+        client_clicked_at_ms: clickedAtMs,
+        page_loaded_at_ms: PAGE_LOADED_AT_MS,
+        navigation: getNavigationMetrics(),
+        attribution: buildAttributionPayload()
+      };
+
+      console.log("PAYLOAD TO API:", payload);
+
+      try {
+        btn.textContent = "Формуємо платіж...";
+        btn.disabled = true;
+        btn.classList.add("is-loading");
+        btn.style.pointerEvents = "none";
+
+        const startedAt = performance.now();
+
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const createOrderMs = Math.round(performance.now() - startedAt);
+        console.log("create-order ms:", createOrderMs);
+        console.log("response status:", res.status);
+
+        const data = await res.json();
+        console.log("response data:", data);
+
+        if (!res.ok || !data.ok || !data.payment) {
+          throw new Error(data.error || "Не вдалося створити оплату");
+        }
+
+        trackDiagnostic("payment_order_created", {
+          product_id: productId,
+          order_reference: data.orderReference,
+          checkout_event_id: checkoutEventId,
+          purchase_event_id: purchaseEventId,
+          create_order_client_ms: createOrderMs,
+          server_timings: data.diagnostics || null,
+          meta_checkout_sent: data.meta_checkout?.ok === true
+        });
+
+        // Старий GTM очікує custom event meta_initiate_checkout.
+        // Той самий checkout_event_id передається і в браузерний Pixel, і в CAPI для дедуплікації.
+        pushBrowserCheckoutEvent(
+          checkoutEventId,
+          data.orderReference,
+          data.value,
+          data.currency
+        );
+
+        // Server-side InitiateCheckout через CAPI.
+        fetch(API_URL + "/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            order_reference: data.orderReference
+          }),
+          keepalive: true
+        })
+          .then(async function (response) {
+            const result = await response.json();
+
+            console.log("Meta InitiateCheckout CAPI:", {
+              status: response.status,
+              result: result
+            });
+
+            return result;
+          })
+          .catch(function (error) {
+            console.error("Meta InitiateCheckout CAPI error:", error);
+
+            return {
+              ok: false,
+              error: String(error)
+            };
+          });
+
+        const payment = data.payment;
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "https://secure.wayforpay.com/pay";
+
+        Object.keys(payment).forEach(function (key) {
+          const value = payment[key];
+
+          if (Array.isArray(value)) {
+            value.forEach(function (item) {
+              const input = document.createElement("input");
+              input.type = "hidden";
+              input.name = key + "[]";
+              input.value = item;
+              form.appendChild(input);
+            });
+          } else {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = value;
+            form.appendChild(input);
+          }
+        });
+
+        document.body.appendChild(form);
+
+        trackDiagnostic("payment_form_submitted", {
+          product_id: productId,
+          order_reference: data.orderReference,
+          checkout_event_id: checkoutEventId,
+          purchase_event_id: purchaseEventId,
+          total_client_ms_from_click: Date.now() - clickedAtMs
+        });
+
+        // A short delay gives the diagnostic beacon and dataLayer event time to leave the page.
+        window.setTimeout(function () {
+          trackDiagnostic("payment_redirect_started", {
+            product_id: productId,
+            order_reference: data.orderReference,
+            checkout_event_id: checkoutEventId,
+            purchase_event_id: purchaseEventId,
+            total_client_ms_from_click: Date.now() - clickedAtMs
+          });
+          form.submit();
+        }, 100);
+
+      } catch (error) {
+        console.error("Помилка create-order/payment:", error);
+
+        trackDiagnostic("payment_error", {
+          product_id: productId,
+          checkout_event_id: checkoutEventId,
+          purchase_event_id: purchaseEventId,
+          message: String(error?.message || error)
+        });
+
+        btn.textContent = originalText;
+        btn.disabled = false;
+        btn.classList.remove("is-loading");
+        btn.style.pointerEvents = "";
+        alert("Не вдалося створити оплату. Спробуйте ще раз.");
+      }
+    });
+  });
+});
+</script>
+<meta content="Вправи для коліна при артрозі — Богдан Латиш" property="og:title"/><meta content="Покрокова програма відновлення коліна: 70+ відеовправ, 2 етапи, готове дозування, тести та формат з індивідуальним розбором." property="og:description"/><link rel="canonical" href="https://bogdan92.pro/kneear/"/><meta property="og:url" content="https://bogdan92.pro/kneear/"/><link rel="stylesheet" href="./kneear.css?v=5"/></head>
+<body class="landing-v4" data-landing="knee-general">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-TPZT7VDW" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const lazyVideos = document.querySelectorAll('.js-lazy-video');
+
+    if (!lazyVideos.length) return;
+
+    const loadVideo = (video) => {
+      if (video.dataset.loaded === 'true') return;
+
+      const sources = video.querySelectorAll('source[data-src]');
+
+      sources.forEach((source) => {
+        source.src = source.dataset.src;
+        source.removeAttribute('data-src');
+      });
+
+      video.dataset.loaded = 'true';
+      video.load();
+
+      const tryPlay = () => {
+        const playPromise = video.play();
+
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Autoplay може бути заблокований браузером.
+            // Poster при цьому залишиться видимим.
+          });
+        }
+      };
+
+      if (video.readyState >= 2) {
+        tryPlay();
+      } else {
+        video.addEventListener('canplay', tryPlay, { once: true });
+      }
+    };
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries, observerInstance) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+
+            loadVideo(entry.target);
+            observerInstance.unobserve(entry.target);
+          });
+        },
+        {
+          // Відео почне завантажуватися трохи раніше,
+          // ніж користувач реально доскролить до нього.
+          rootMargin: '400px 0px',
+          threshold: 0.01
+        }
+      );
+
+      lazyVideos.forEach((video) => {
+        observer.observe(video);
+      });
+    } else {
+      // Fallback для дуже старих браузерів
+      lazyVideos.forEach(loadVideo);
+    }
+  });
+</script>
+<main>
+<section class="hero-knee" id="hero"><div aria-hidden="true" class="hero-knee__photo"></div><div aria-hidden="true" class="hero-knee__shade"></div><div class="hero-knee__inner"><p class="hero-knee__eyebrow">Авторська програма фізичного терапевта • 10+ років досвіду</p><h1 class="hero-knee__title">Менше болю та скутості в колінах — <span>більше руху та свободи у повсякденному житті</span></h1><p class="hero-knee__subtitle"><strong>Поступово повертайте впевненість у ходьбі, сходах та звичних справах за готовою програмою вправ від фізичного терапевта.</strong></p><p class="kneear-hero-explain">Навіть якщо на знімку вже є артроз, правильно підібрані вправи можуть допомагати зменшувати дискомфорт і покращувати функцію коліна.</p><ul class="hero-knee__bullets"><li>Посильний старт із поступовим збільшенням навантаження.</li><li>70+ відеовправ, готове дозування та тести.</li><li>Від 15 хвилин удома, без дорогих тренажерів.</li></ul><div class="kneear-offer"><del>1899 грн</del><span>Акційна ціна</span><strong>590 грн</strong><p>Повна програма · Одноразова оплата</p></div><div class="hero-knee__cta"><a class="hero-knee__btn hero-knee__btn--primary" href="#pricing" data-scroll-to="#pricing">Отримати програму за 590 грн</a></div><p class="hero-knee__delivery">Доступ одразу • Telegram • 14 днів гарантії повернення коштів</p><div class="knee-hero-test"><p>Не впевнені, чи підійде курс?</p><a class="kneear-quiz-cta" href="#quiz" data-scroll-to="#quiz">Пройти тест із 5 запитань <span aria-hidden="true">→</span></a></div></div></section>
+
+<section class="lp-section lp-section--light" id="who"><div class="lp-shell"><div class="lp-heading"><h2>Артроз коліна вже впливає на ваші звичні справи?</h2></div><p>Можливо, ви впізнаєте себе в одній із цих ситуацій.</p><div class="kneear-cards"><article class="kneear-photo-card"><img class="kneear-card-image" src="./img/stairs.jpg" alt="Людина на сходах із поручнем" loading="lazy" width="900" height="600"/><div class="kneear-card-copy"><h3>Спуск зі сходів став неприємним</h3><p>Доводиться триматися за поручень, рухатися обережніше або більше навантажувати іншу ногу.</p></div></article><article class="kneear-photo-card"><img class="kneear-card-image" src="./img/sport.jpg" alt="Прогулянка парковою доріжкою" loading="lazy" width="900" height="600"/><div class="kneear-card-copy"><h3>Після прогулянки коліно починає боліти</h3><p>Зранку все може бути добре, але після тривалої ходьби чи активного дня з’являється дискомфорт.</p></div></article><article class="kneear-photo-card"><img class="kneear-card-image" src="./img/hronic.jpg" alt="Дискомфорт у коліні після сидіння" loading="lazy" width="900" height="600"/><div class="kneear-card-copy"><h3>З’являється скутість після відпочинку</h3><p>Перші рухи даються важче, а щоб нормально розходитися, потрібен певний час.</p></div></article><article class="kneear-photo-card"><img class="kneear-card-image" src="./img/problem.webp" alt="Чоловік сидить на дивані" loading="lazy" width="900" height="600"/><div class="kneear-card-copy"><h3>Боїтеся нашкодити коліну навантаженнями</h3><p>На знімку виявили артроз, тому ви стали менше ходити, уникати присідань або фізичної активності.</p></div></article></div><p class="kneear-note">Ці ситуації не означають, що потрібно повністю відмовлятися від руху. Часто важливо знайти посильний рівень навантаження і поступово підвищувати здатність коліна його переносити.</p></div></section>
+<section class="lp-section lp-section--cream" id="results"><div class="lp-shell"><div class="lp-heading"><h2>Що може змінитися завдяки регулярним заняттям?</h2></div><p>Мета програми — не просто виконувати вправи, а поступово покращувати здатність коліна переносити повсякденні навантаження.</p><div class="kneear-cards"><article class="kneear-photo-card"><img class="kneear-card-image" src="./img/paine.png" alt="Жінка тримається за коліно вдома" loading="lazy" width="900" height="600"/><div class="kneear-card-copy"><h3>Менше болю та скутості</h3><p>Працюйте над зменшенням дискомфорту під час звичних рухів.</p></div></article><article class="kneear-photo-card"><img class="kneear-card-image" src="./img/walck.png" alt="Активність на свіжому повітрі" loading="lazy" width="900" height="600"/><div class="kneear-card-copy"><h3>Легше ходити та довше залишатися активними</h3><p>Поступово розвивайте силу та витривалість для прогулянок і щоденних справ.</p></div></article><article class="kneear-photo-card"><img class="kneear-card-image" src="./img/stairs2.png" alt="Рух сходами з поручнем" loading="lazy" width="900" height="600"/><div class="kneear-card-copy"><h3>Більше впевненості на сходах</h3><p>Покращуйте контроль руху й силу м’язів, які допомагають під час підйому та спуску.</p></div></article><article class="kneear-photo-card"><img class="kneear-card-image" src="./img/sit.png" alt="Жінка виконує присідання біля дивана" loading="lazy" width="900" height="600"/><div class="kneear-card-copy"><h3>Менше страху перед навантаженням</h3><p>Навчіться підбирати посильні вправи, оцінювати реакцію коліна та розуміти, коли можна рухатися далі.</p></div></article></div><p class="knee-small">Результати індивідуальні та залежать від симптомів, супутніх захворювань і регулярності занять.</p><div class="kneear-reviews"><figure><figcaption>Гонартроз обох колін: досвід учасниці</figcaption><button type="button" class="review-zoom" data-review="./img/review-6302.jpg" aria-label="Збільшити відгук: Гонартроз обох колін: досвід учасниці"><img src="./img/review-6302.jpg" alt="Гонартроз обох колін: досвід учасниці" loading="lazy"/></button><span>Натисніть, щоб збільшити</span></figure><figure><figcaption>Ходьба та сходи: досвід учасника</figcaption><button type="button" class="review-zoom" data-review="./img/review-6304.jpg" aria-label="Збільшити відгук: Ходьба та сходи: досвід учасника"><img src="./img/review-6304.jpg" alt="Ходьба та сходи: досвід учасника" loading="lazy"/></button><span>Натисніть, щоб збільшити</span></figure><figure><figcaption>Рухливість колін: досвід учасниці</figcaption><button type="button" class="review-zoom" data-review="./img/review-6305.jpg" aria-label="Збільшити відгук: Рухливість колін: досвід учасниці"><img src="./img/review-6305.jpg" alt="Рухливість колін: досвід учасниці" loading="lazy"/></button><span>Натисніть, щоб збільшити</span></figure></div><p class="knee-small">Особистий досвід учасників. Результати та строки змін можуть відрізнятися.</p></div></section><section class="lp-section lp-section--light" id="why"><div class="lp-shell"><div class="lp-heading"><h2>Чому біль при артрозі може зберігатися або повертатися?</h2></div><div class="kneear-cards"><article><h3>Надто обмежуєте рух</h3><p>Коли коліно болить, природно хотіти його берегти. Але якщо тривалий час майже не навантажувати ногу, м’язи можуть втрачати силу, а звичні справи поступово ставати складнішими.</p></article><article><h3>Покладаєтеся лише на полегшення симптомів</h3><p>Мазі, таблетки та інші призначені методи лікування можуть допомагати контролювати біль. Але для покращення сили, витривалості та функції коліна часто потрібна ще й активна реабілітація.</p></article><article><h3>Виконуєте одні й ті самі вправи без прогресії</h3><p>Навіть хороші вправи можуть перестати забезпечувати потрібний розвиток, якщо навантаження не змінюється відповідно до ваших можливостей.</p></article></div><div class="kneear-note"><p>Що спільного в цих ситуаціях?</p><h3>Коліну може бракувати поступового, правильно підібраного навантаження.</h3><p>Саме тому важлива не одна «чарівна» вправа, а зрозуміла система: з чого почати, скільки виконувати та коли переходити до складніших рухів.</p><p>За таким принципом побудована моя програма відновлення коліна.</p></div></div></section><section class="program" id="program">
+<div class="program__inner">
+<p class="sales-kicker">Структура курсу</p>
+<h2 class="program__title">Від простих рухів до впевненішої ходьби та щоденної активності</h2>
+<p class="program__lead">Не потрібно самостійно складати комплекс чи гадати, які вправи виконувати сьогодні.</p>
+<ol class="program__timeline">
+<li class="program__step">
+<div aria-hidden="true" class="program__rail"></div>
+<article class="program__card">
+<span class="program__badge">Етап 1 • Базовий</span>
+<h3 class="program__h">Починаємо з посильного навантаження</h3><p>Прості вправи допомагають працювати над рухливістю, активацією м’язів та базовою силою. Ви отримуєте готові рекомендації щодо виконання й дозування.</p><figure class="exercise-demo"><div class="exercise-demo__frame"><video class="exercise-demo__video js-lazy-video" autoplay muted loop playsinline preload="none" poster="./img/basic-poster.jpg" aria-label="Приклад вправи базового етапу"><source data-src="./video/%D0%B3%D0%BE%D1%81%D1%82%D1%82%D1%80%D0%B8%D0%B8%CC%86%20%D0%B5%D1%82%D0%B0%D0%BF%20%D0%B2%D0%BF%D1%80%D0%B0%D0%B2%D0%B8.MOV" type="video/mp4"/></video></div><figcaption>Приклад вправи базового етапу</figcaption><button class="exercise-demo__toggle" type="button" aria-label="Призупинити відео">Пауза</button></figure>
+</article>
+</li>
+<li class="program__step">
+<div aria-hidden="true" class="program__rail"></div>
+<article class="program__card program__card--gate">
+<span class="program__badge program__badge--gate">Тести</span>
+<h3 class="program__h">Перевіряємо готовність до наступного рівня</h3><p>Оцінюєте контроль руху та реакцію коліна на заняття. Якщо критерії ще не виконані, не потрібно поспішати зі складнішими вправами.</p>
+</article>
+</li>
+<li class="program__step">
+<div aria-hidden="true" class="program__rail"></div>
+<article class="program__card">
+<span class="program__badge">Етап 2 • Функціональний</span>
+<h3 class="program__h">Поступово повертаємо силу й витривалість</h3><p>Вправи стають складнішими та допомагають готувати коліно до звичних навантажень: ходьби, сходів, присідань та активного дня.</p><figure class="exercise-demo exercise-demo--balance"><div class="exercise-demo__frame"><video class="exercise-demo__video js-lazy-video" autoplay muted loop playsinline preload="none" poster="./img/balance-poster.jpg" aria-label="Приклад функціональної вправи на баланс"><source data-src="./video/Y%20balance.mov" type="video/mp4"/></video></div><figcaption>Приклад функціональної вправи на баланс</figcaption><button class="exercise-demo__toggle" type="button" aria-label="Призупинити відео">Пауза</button></figure>
+</article>
+</li>
+</ol><p>Вам не потрібно вирішувати все самостійно — послідовність і дозування вже підготовлені.</p><a class="lp-button lp-button--primary" href="#pricing" data-scroll-to="#pricing">Отримати готовий план відновлення — 590 грн</a>
+</div>
+</section><section class="included included--alt" id="included">
+<div class="included__inner">
+<p class="sales-kicker">Що ви отримуєте</p>
+<h2 class="included__title">Що входить у повну програму</h2>
+<p class="included__lead">Це загальна програма вправ для коліна. У комплекті є окреме відео автора, як проходити курс при артрозі. Відео, тести й додаткові матеріали вже зібрані разом — щоб було зручно займатися та контролювати прогрес.</p>
+<div class="included__grid included__grid--four"><article class="included__card"><div class="included__media"><img alt="70+ відеовправ із готовим планом" loading="lazy" src="./img/ex.jpg"/></div><div class="included__body"><h3 class="included__h">70+ відеовправ із поясненнями</h3><p class="included__p">Наочна техніка виконання, кількість повторень і підходів — усе під рукою під час заняття.</p></div></article><article class="included__card"><div class="included__media"><img alt="2 послідовні етапи" loading="lazy" src="./img/center1.jpg"/></div><div class="included__body"><h3 class="included__h">2 етапи відновлення</h3><p class="included__p">Від базової рухливості та сили — до складніших вправ на баланс, контроль і витривалість.</p></div></article><article class="included__card"><div class="included__media"><img alt="Тести та критерії переходу" loading="lazy" src="./img/diag.jpg"/></div><div class="included__body"><h3 class="included__h">Тести для контролю прогресу</h3><p class="included__p">Перевіряйте реакцію коліна та критерії готовності до наступного етапу.</p></div></article><article class="included__card"><div class="included__media"><img alt="6 тематичних бонусних відео" loading="lazy" src="./img/b5.webp"/></div><div class="included__body"><h3 class="included__h">6 тематичних бонусних відео</h3><p class="included__p">Зокрема окреме відео автора: як працювати з курсом при артрозі коліна. Також розбори меніска та інших поширених проблем коліна.</p></div></article><article class="included__card"><div class="included__media"><img alt="PDF-плани та зручний доступ" loading="lazy" src="./img/pdf.jpg"/></div><div class="included__body"><h3 class="included__h">PDF-плани й додаткові матеріали</h3><p class="included__p">Зручні підказки для занять: плани та дозування, до яких можна швидко повернутися.</p></div></article></div>
+<div class="included__cta"><a class="btn btn--primary lp-button lp-button--primary" data-scroll-to="#pricing" href="#pricing">Отримати повну програму — 590 грн</a></div>
+</div>
+</section><section class="lp-section lp-section--light" id="course-preview"><div class="lp-shell"><div class="program-preview" id="preview">
+<div class="program-preview__copy" data-reveal="">
+<p class="sales-kicker">Усе вже зібрано в Telegram</p>
+<h3>Усе вже підготовлено. Вам залишається відкрити заняття й виконувати вправи.</h3>
+<p>Після придбання ви отримуєте доступ до програми в Telegram.</p><div class="kneear-cards"><article><h3>1. Відкриваєте програму</h3><p>Усі заняття, відео та додаткові матеріали зібрані в одному місці.</p></article><article><h3>2. Обираєте відповідний етап</h3><p>Починаєте з посильного рівня та виконуєте вправи за відеоінструкціями.</p></article><article><h3>3. Займаєтеся у зручний час</h3><p>Без необхідності відвідувати зал. Достатньо виділяти від 15 хвилин на заняття.</p></article><article><h3>4. Відстежуєте прогрес</h3><p>Тести й критерії допомагають оцінювати готовність до складніших навантажень.</p></article></div><p>Подивіться, як курс виглядає зсередини — короткий огляд програми.</p>
+<div class="program-preview__actions"><a class="btn btn--primary lp-button lp-button--primary" data-scroll-to="#pricing" href="#pricing">Почати програму</a><span>Доступ одразу після оплати</span></div>
+</div>
+<figure class="product-preview__media product-preview__media--video" data-reveal="">
+<video aria-label="Демонстрація програми відновлення коліна в Telegram" autoplay="" class="product-preview__video js-lazy-video" loop="" muted="" playsinline="" poster="./img/teleg.jpg" preload="none">
+<source data-src="./video/telegram-demo.mp4" type="video/mp4"/>
+</video>
+</figure>
+</div></div></section>
+<section class="lp-section lp-section--cream" id="evidence"><div class="lp-shell"><div class="lp-heading"><h2>Чому я використовую саме поступові вправи?</h2></div><p>При артрозі коліна регулярні терапевтичні вправи є одним із базових методів допомоги, які рекомендуються міжнародними клінічними настановами. Вони можуть допомагати зменшувати біль, покращувати силу м’язів і функцію коліна.</p><p>Але важливий не просто факт виконання вправ, а їх відповідність можливостям людини та поступова адаптація навантаження.</p><p>Саме ці принципи я використав під час створення програми.</p><a href="https://www.nice.org.uk/guidance/NG226/chapter/recommendations#therapeutic-exercise" target="_blank" rel="noopener">Джерело: NICE NG226 — терапевтичні вправи при остеоартрозі</a><p class="knee-small">Настанова описує принципи допомоги при артрозі, а не оцінює цей конкретний курс.</p></div></section><section class="lp-section lp-section--deep" id="author">
+<div class="lp-shell lp-author">
+<div class="lp-author__photo"><img alt="Богдан Латиш — фізичний терапевт" loading="lazy" src="./img/avatar.webp"/></div>
+<div class="lp-author__content">
+<p class="lp-kickers">Автор програми</p>
+<h2>Богдан Латиш — фізичний терапевт із понад 10-річним досвідом</h2>
+<ul class="lp-checks" role="list">
+<li>Понад 2000 пацієнтів у практиці та онлайн-роботі.</li>
+<li>Міжнародне навчання: Mulligan Concept, Maitland, PNF, McKenzie та інші підходи.</li>
+<li>Практична робота з болем, травмами та відновленням функції коліна.</li>
+</ul>
+<p>Мета цієї програми — допомогти зробити домашні заняття більш зрозумілими й послідовними.</p>
+</div>
+</div>
+</section><section class="lp-section lp-section--light" id="reviews"><div class="lp-shell"><div class="lp-heading"><h2>Досвід людей, які вже проходили програму</h2></div><div class="kneear-reviews"><figure><figcaption>Біль у колінах: досвід учасника</figcaption><button type="button" class="review-zoom" data-review="./img/review-6306.jpg" aria-label="Збільшити відгук: Біль у колінах: досвід учасника"><img src="./img/review-6306.jpg" alt="Біль у колінах: досвід учасника" loading="lazy"/></button><span>Натисніть, щоб збільшити</span></figure><figure><figcaption>Повсякденна активність: досвід учасниці</figcaption><button type="button" class="review-zoom" data-review="./img/review-6308.jpg" aria-label="Збільшити відгук: Повсякденна активність: досвід учасниці"><img src="./img/review-6308.jpg" alt="Повсякденна активність: досвід учасниці" loading="lazy"/></button><span>Натисніть, щоб збільшити</span></figure><figure><figcaption>Домашні заняття: досвід учасниці</figcaption><button type="button" class="review-zoom" data-review="./img/review-6307.jpg" aria-label="Збільшити відгук: Домашні заняття: досвід учасниці"><img src="./img/review-6307.jpg" alt="Домашні заняття: досвід учасниці" loading="lazy"/></button><span>Натисніть, щоб збільшити</span></figure></div><p class="knee-small">Особистий досвід учасників. Результати та строки змін можуть відрізнятися.</p><h3 class="kneear-more-title">Ще більше досвіду учасників</h3><div class="kneear-reviews"><figure><button class="review-zoom" type="button" data-review="./img/3.jpg" aria-label="Збільшити відгук"><img src="./img/3.jpg" alt="Відгук учасника програми" loading="lazy"/></button></figure><figure><button class="review-zoom" type="button" data-review="./img/5.jpg" aria-label="Збільшити відгук"><img src="./img/5.jpg" alt="Відгук учасника програми" loading="lazy"/></button></figure><figure><button class="review-zoom" type="button" data-review="./img/6.jpg" aria-label="Збільшити відгук"><img src="./img/6.jpg" alt="Відгук учасника програми" loading="lazy"/></button></figure><figure><button class="review-zoom" type="button" data-review="./img/8.jpg" aria-label="Збільшити відгук"><img src="./img/8.jpg" alt="Відгук учасника програми" loading="lazy"/></button></figure><figure><button class="review-zoom" type="button" data-review="./img/9.jpg" aria-label="Збільшити відгук"><img src="./img/9.jpg" alt="Відгук учасника програми" loading="lazy"/></button></figure><figure><button class="review-zoom" type="button" data-review="./img/10.jpg" aria-label="Збільшити відгук"><img src="./img/10.jpg" alt="Відгук учасника програми" loading="lazy"/></button></figure><figure><button class="review-zoom" type="button" data-review="./img/11.jpg" aria-label="Збільшити відгук"><img src="./img/11.jpg" alt="Відгук учасника програми" loading="lazy"/></button></figure><figure><button class="review-zoom" type="button" data-review="./img/4.jpg" aria-label="Збільшити відгук"><img src="./img/4.jpg" alt="Відгук учасника програми" loading="lazy"/></button></figure></div></div></section>
+<section class="lp-section lp-section--cream" id="quiz"><div class="lp-shell"><div class="lp-heading lp-heading--compact"><p class="lp-card-label">Важко обрати?</p><h2>Дізнайтеся, з чого почати саме вам</h2><p>Оберіть симптоми та відомі вам діагнози — за 5 коротких кроків ви отримаєте <strong>підказку щодо формату курсу та тематичних бонусів</strong>, які можуть бути корисними у вашій ситуації.</p></div><div class="knee-quiz" id="knee-quiz"><button class="lp-button lp-button--primary knee-quiz-start" id="quiz-start" type="button">Отримати мою рекомендацію <span aria-hidden="true">→</span></button><noscript><p>Для квізу увімкніть JavaScript або перегляньте формати нижче.</p></noscript></div></div></section><section class="pricing" id="pricing">
+<div class="pricing__inner">
+<!-- <p class="sales-kicker">Оберіть формат</p> -->
+<h2 class="pricing__title">Оберіть зручний формат відновлення</h2>
+<p class="pricing__lead">В обох варіантах ви отримуєте повну програму. Різниця — у персональних рекомендаціях.</p>
+<div class="pricing__grid">
+<article class="pricing__card">
+<div class="pricing__head"><h3 class="pricing__name">Повна програма відновлення коліна</h3><p class="kneear-sale-label">Акційна ціна</p></div>
+<div class="pricing__price"><strong class="pricing__amount">590</strong><span class="pricing__currency">грн</span><del class="pricing__old">1899 грн</del></div>
+<ul class="pricing__list">
+<li>70+ відеовправ із готовим дозуванням</li>
+<li>2 послідовні етапи від простого до складнішого</li>
+<li>тести та критерії переходу</li>
+<li>Бонусний розбір артрозу коліна та інші тематичні бонуси</li>
+<li>PDF-плани та нагадування</li>
+<li>доступ до програми у Telegram без обмеження в часі</li>
+</ul>
+<div class="pricing__actions">
+<a class="btn btn--primary pricing__btn pay-btn" data-product-id="knee_590" href="#">Отримати повну програму — 590 грн</a>
+<p class="pricing__note">14 днів гарантії повернення коштів</p>
+</div>
+</article>
+<article class="pricing__card pricing__card--pro" id="pricing-pro">
+<span class="pricing__badge">З персональним розбором</span>
+<div class="pricing__head"><h3 class="pricing__name">Програма + персональні рекомендації</h3></div>
+<div class="pricing__price"><strong class="pricing__amount accent">1090</strong><span class="pricing__currency">грн</span></div>
+<ul class="pricing__list"><li>повна програма за 590 грн</li><li>розбір історії, документів та відео тестів</li><li>персональні рекомендації щодо старту</li><li>повторний зв’язок через 2 тижні</li></ul>
+<div class="pricing__actions"><button class="knee-more" data-open-dialog="personal-modal" type="button">Детальніше про індивідуальний розбір</button>
+<a class="btn btn--primary pricing__btn pay-btn" data-product-id="knee_1090" href="#">Обрати персональний формат</a>
+<p class="pricing__note">Без дзвінків — у зручний для вас час</p>
+</div>
+</article>
+</div>
+<div class="pricing__trust"><span>Доступ одразу після оплати</span><span>Зручний формат у Telegram</span><span>14 днів гарантії повернення</span></div>
+</div>
+</section>
+<section class="lp-section lp-section--guarantee" id="guarantee">
+<div class="lp-shell"><div class="lp-guarantee"><span aria-hidden="true" class="lp-guarantee__icon">✓</span><div><p class="lp-card-label">Можна спробувати без зайвого ризику</p><h2>14 днів гарантії повернення коштів</h2><p>Якщо після знайомства з матеріалами ви зрозумієте, що формат вам не підходить, напишіть протягом 14 днів — оплату буде повернено.</p></div><a class="lp-button lp-button--primary" data-scroll-to="#pricing" href="#pricing">Почати програму за 590 грн</a></div></div>
+</section><section class="lp-section lp-section--deep" id="faq"><div class="lp-shell"><div class="lp-heading"><h2>Найчастіші запитання перед початком занять</h2></div><div class="bs-faq__list" data-faq=""><div class="bs-faq__item"><button aria-controls="faq-a20" aria-expanded="false" class="bs-faq__q" id="faq-q20" type="button">Чи можна виконувати вправи при артрозі 2–3 ступеня?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q20" class="bs-faq__a" id="faq-a20" role="region"><div class="bs-faq__a-inner">Рентгенологічний ступінь артрозу сам по собі не визначає, які саме вправи вам можна виконувати. Важливі симптоми, рухливість, сила, реакція на навантаження та супутні захворювання. Якщо ви не впевнені, чи підходить програма, варто попередньо обговорити це з фахівцем.</div></div></div><div class="bs-faq__item"><button aria-controls="faq-a21" aria-expanded="false" class="bs-faq__q" id="faq-q21" type="button">Чи не погіршать вправи стан суглоба?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q21" class="bs-faq__a" id="faq-a21" role="region"><div class="bs-faq__a-inner">Правильно підібрані терапевтичні вправи рекомендовані при артрозі. Але навантаження повинно відповідати вашому стану. Не потрібно виконувати складні вправи через сильний біль або ігнорувати значне погіршення симптомів.</div></div></div><div class="bs-faq__item"><button aria-controls="faq-a22" aria-expanded="false" class="bs-faq__q" id="faq-q22" type="button">Що робити, якщо болить навіть під час звичайної ходьби?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q22" class="bs-faq__a" id="faq-a22" role="region"><div class="bs-faq__a-inner">Це не означає, що потрібно одразу переходити до складних навантажень. Програма містить базовий етап, але при вираженому або незвичному болю спочатку може бути потрібна індивідуальна оцінка.</div></div></div><div class="bs-faq__item"><button aria-controls="faq-a23" aria-expanded="false" class="bs-faq__q" id="faq-q23" type="button">Чи не пізно починати заняття в старшому віці?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q23" class="bs-faq__a" id="faq-a23" role="region"><div class="bs-faq__a-inner">Силові та функціональні вправи можуть бути корисними і в старшому віці. Важливо враховувати індивідуальні можливості, а не лише вік.</div></div></div><div class="bs-faq__item"><button aria-controls="faq-a24" aria-expanded="false" class="bs-faq__q" id="faq-q24" type="button">Чи потрібен тренажерний зал?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q24" class="bs-faq__a" id="faq-a24" role="region"><div class="bs-faq__a-inner">Ні. Основні заняття програми розраховані на домашній формат без дорогих тренажерів. Для деяких складніших вправ можуть знадобитися еластична стрічка або невелике обтяження.</div></div></div><div class="bs-faq__item"><button aria-controls="faq-a25" aria-expanded="false" class="bs-faq__q" id="faq-q25" type="button">Чи зможу я користуватися курсом із телефона?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q25" class="bs-faq__a" id="faq-a25" role="region"><div class="bs-faq__a-inner">Так. Програма доступна через Telegram. Ви можете відкривати заняття й переглядати відеоінструкції на смартфоні.</div></div></div><div class="bs-faq__item"><button aria-controls="faq-a26" aria-expanded="false" class="bs-faq__q" id="faq-q26" type="button">Як швидко я відчую результат?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q26" class="bs-faq__a" id="faq-a26" role="region"><div class="bs-faq__a-inner">Це індивідуально. Зміни залежать від вихідного стану, регулярності занять та реакції на навантаження. Програма не гарантує зникнення болю за визначену кількість днів.</div></div></div><div class="bs-faq__item"><button aria-controls="faq-a27" aria-expanded="false" class="bs-faq__q" id="faq-q27" type="button">Чи замінює курс лікування в лікаря?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q27" class="bs-faq__a" id="faq-a27" role="region"><div class="bs-faq__a-inner">Ні. Програма є інструментом для самостійних занять і не замінює необхідну діагностику чи індивідуальне лікування. При значному набряку, гострому погіршенні, блокуванні коліна або інших тривожних симптомах потрібна оцінка фахівця.</div></div></div><div class="bs-faq__item"><button aria-controls="faq-a4" aria-expanded="false" class="bs-faq__q" id="faq-q4" type="button">Що робити, якщо після вправ біль посилюється?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q4" class="bs-faq__a" id="faq-a4" role="region"><div class="bs-faq__a-inner">Зменшіть амплітуду, кількість повторень або оберіть простіший варіант. Якщо реакція виражена, наростає або не минає після зменшення навантаження, вправу варто тимчасово пропустити й отримати професійну оцінку.</div></div></div>
+<div class="bs-faq__item"><button aria-controls="faq-a6" aria-expanded="false" class="bs-faq__q" id="faq-q6" type="button">Коли я отримаю доступ?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q6" class="bs-faq__a" id="faq-a6" role="region"><div class="bs-faq__a-inner">Одразу після успішної оплати вас буде перенаправлено на сторінку з кнопкою доступу до Telegram-бота.</div></div></div>
+<div class="bs-faq__item"><button aria-controls="faq-a7" aria-expanded="false" class="bs-faq__q" id="faq-q7" type="button">Чи залишається доступ до матеріалів?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q7" class="bs-faq__a" id="faq-a7" role="region"><div class="bs-faq__a-inner">Так, доступ до придбаної програми залишається без обмеження в часі, тому до матеріалів можна повертатися у власному темпі.</div></div></div>
+<div class="bs-faq__item"><button aria-controls="faq-a8" aria-expanded="false" class="bs-faq__q" id="faq-q8" type="button">Як проходять індивідуальні рекомендації?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q8" class="bs-faq__a" id="faq-a8" role="region"><div class="bs-faq__a-inner">Після оплати формату за 1090 грн ви заповнюєте анкету, за потреби додаєте документи та відео простих тестів. Богдан особисто відповідає у Telegram текстовими й голосовими повідомленнями. Дзвінок або відеозустріч не потрібні.</div></div></div>
+<div class="bs-faq__item"><button aria-controls="faq-a9" aria-expanded="false" class="bs-faq__q" id="faq-q9" type="button">Чим відрізняються формати за 590 та 1090 грн?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q9" class="bs-faq__a" id="faq-a9" role="region"><div class="bs-faq__a-inner">За 590 грн ви отримуєте повний курс для самостійних занять. За 1090 грн — той самий курс плюс особистий розбір історії, документів і відео тестів, рекомендації для старту та повторний зв’язок через 2 тижні.</div></div></div>
+<div class="bs-faq__item"><button aria-controls="faq-a10" aria-expanded="false" class="bs-faq__q" id="faq-q10" type="button">Як працює гарантія повернення коштів?<span aria-hidden="true" class="bs-faq__chev"></span></button><div aria-labelledby="faq-q10" class="bs-faq__a" id="faq-a10" role="region"><div class="bs-faq__a-inner">Протягом 14 днів після покупки діє гарантія повернення коштів. Якщо формат вам не підійде, напишіть на контактну адресу або в Telegram.</div></div></div></div></div></section>
+
+<section class="lp-section lp-section--cream" id="final-cta"><div class="lp-shell"><div class="lp-heading"><h2>Почніть із посильних вправ і поступово повертайте більше руху у своє життя</h2></div><p>Готова програма, зрозуміле дозування, тести й відеопояснення — усе для занять удома у своєму темпі.</p><a class="lp-button lp-button--primary" href="#pricing" data-scroll-to="#pricing">Отримати програму за 590 грн</a><p>Доступ одразу після оплати • 14 днів гарантії повернення коштів.</p></div></section></main>
+<footer class="lp-footer">
+<div class="lp-shell lp-footer__grid">
+<div><p>ФОП Латиш Богдан Вячеславович<br/>ЄДРПОУ 3392515210</p></div>
+<div><h3>Контакти</h3><a href="mailto:bog.rehab@gmail.com">bog.rehab@gmail.com</a><a href="https://t.me/bogdanrehab" rel="noopener" target="_blank">Telegram</a><a href="https://www.instagram.com/bogdan.rehab" rel="noopener" target="_blank">Instagram</a></div>
+<div><h3>Документи</h3><a href="/privacy/">Політика конфіденційності</a><a href="/offer/">Публічна оферта</a></div>
+</div>
+<div class="lp-shell lp-footer__bottom">© 2026 Bogdan Rehab</div>
+</footer>
+<a aria-label="Перейти до вибору формату" class="lp-sticky-cta" data-scroll-to="#pricing" href="#pricing">Від 590 грн • Обрати формат</a>
+
+<dialog aria-labelledby="personal-title" class="knee-modal" id="personal-modal"><button aria-label="Закрити" class="knee-close" data-close-dialog="" type="button">×</button><section class="knee-personal-content" id="personal-content">
+<div class="lp-shell lp-personal">
+<div class="lp-personal__content">
+<p class="lp-kicker">Потрібно більше персоналізації?</p>
+<h2 id="personal-title">Курс + індивідуальний розбір вашої ситуації</h2>
+<p class="lp-personal__lead">Якщо ви не впевнені, з чого починати саме у вашому випадку, можна додати персональний розбір автора до повної програми.</p>
+<ul class="lp-checks" role="list">
+<li>Розбір анамнезу, історії болю та ваших цілей</li>
+<li>Перегляд МРТ, висновків або інших документів, якщо вони є</li>
+<li>Аналіз простих рухових тестів за надісланими відео</li>
+<li>Рекомендації щодо старту й проходження програми</li>
+<li>Відповіді на запитання та повторний зв’язок через 2 тижні</li>
+</ul>
+<div class="lp-format-note">
+<span class="lp-format-note__label">Як проходить взаємодія</span>
+<strong>Без дзвінків — у форматі переписки та голосових повідомлень у Telegram</strong>
+<p>Ви надсилаєте інформацію, документи та відео у зручний час. Богдан особисто переглядає матеріали та дає акценти для вашого старту.</p>
+</div>
+</div>
+</div>
+</section><div class="kneear-reviews kneear-reviews--personal">
+<figure><img alt="Відгук після індивідуальних рекомендацій" loading="lazy" src="./img/IMG_5294.jpg"/></figure>
+<figure><img alt="Відгук про персональний розбір ситуації" loading="lazy" src="./img/IMG_5295.jpg"/></figure>
+<figure><img alt="Відгук про індивідуальні рекомендації" loading="lazy" src="./img/IMG_5316.jpg"/></figure>
+</div></dialog><script defer="" src="./knee.js?v=14"></script><dialog class="review-dialog" id="review-dialog" aria-label="Відгук у повному розмірі"><button type="button" aria-label="Закрити відгук">×</button><img alt="Повний скриншот відгуку"/></dialog><script defer src="./reviews.js?v=2"></script><script defer src="./exercise-demo.js"></script></body>
+</html>
