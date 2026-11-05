@@ -366,10 +366,10 @@
       meta.append(el('p','',pro?'Повний курс і персональний розбір історії, документів та рухових тестів, рекомендації для старту й повторний зв’язок через 2 тижні.':'Повна програма вправ, тести для переходу між етапами, 6 тематичних бонусних відео та PDF-матеріали.'));
       offer.append(meta);
       const actions=el('div','kq-result__offer-actions');
-      actions.append(el('strong','kq-result__price',pro?'1090 грн':'590 грн'));
-      const primary=el('a','lp-button lp-button--primary kq-result__cta',pro?'Переглянути формат за 1090 грн →':'Переглянути курс за 590 грн →');
+      actions.append(el('strong','kq-result__price',pro?'990 грн':'490 грн'));
+      const primary=el('a','lp-button lp-button--primary kq-result__cta',pro?'Переглянути формат за 990 грн →':'Переглянути курс за 490 грн →');
       primary.href=pro?'#pricing-pro':'#pricing';primary.dataset.scrollTo=primary.getAttribute('href');actions.append(primary);
-      const alt=el('a','kq-result__alt-link',pro?'Або самостійний формат за 590 грн':'Або курс із персональним розбором');
+      const alt=el('a','kq-result__alt-link',pro?'Або самостійний формат за 490 грн':'Або курс із персональним розбором');
       alt.href=pro?'#pricing':'#pricing-pro';alt.dataset.scrollTo=alt.getAttribute('href');actions.append(alt);offer.append(actions);
     }else{
       const caution=card(root,'kq-result__caution','Що робити зараз');
