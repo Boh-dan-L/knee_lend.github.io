@@ -1,0 +1,267 @@
+--- a/main.py
++++ b/main.py
+@@ -6,6 +6,7 @@
+ import os
+ import time
+ import uuid
++from decimal import Decimal, InvalidOperation
+ from urllib.parse import urlencode, urlsplit, urlunsplit
+
+ import requests
+@@ -1174,7 +1175,7 @@
+ # CREATE ORDER
+ # ============================================================
+
+-def rfoot_order_response(request, order):
++def existing_order_response(request, order):
+     payload = {
+         "ok": True,
+         "orderReference": order["order_reference"],
+@@ -1269,12 +1270,17 @@
+
+         now = int(time.time())
+
+-        # Stable only for Rfoot retries; old products retain their exact behavior.
+-        if product_id == "rfoot_370":
++        is_kneeq = (
++            product_id in {"knee_590", "knee_1090"}
++            and clean_url(data.get("event_source_url")) == "https://bogdan92.pro/kneeq/"
++        )
++        idempotent = product_id == "rfoot_370" or is_kneeq
++        if idempotent:
+             attempt_key = str(purchase_event_id)
+             if len(attempt_key) > 128 or len(attempt_key) < 8:
+                 return json_response(request, {"ok": False, "error": "Invalid attempt ID"}, 400)
+-            order_reference = "RFOOT-" + hashlib.sha256(attempt_key.encode()).hexdigest()[:32]
++            prefix = "RFOOT-" if product_id == "rfoot_370" else "KNEEQ-"
++            order_reference = prefix + hashlib.sha256(attempt_key.encode()).hexdigest()[:32]
+         else:
+             order_reference = f"ORD-{uuid.uuid4().hex[:12]}"
+
+@@ -1395,7 +1401,7 @@
+         firestore_started_at = time.perf_counter()
+
+         order_ref = db.collection("orders").document(order_reference)
+-        if product_id == "rfoot_370":
++        if idempotent:
+             # Firestore create is atomic: concurrent retries cannot overwrite paid data.
+             try:
+                 order_ref.create(order)
+@@ -1406,9 +1412,10 @@
+                 saved = existing.to_dict()
+                 if (saved.get("product_id") != product_id
+                         or saved.get("pixel_key") != pixel_key
+-                        or saved.get("purchase_event_id") != purchase_event_id):
++                        or saved.get("purchase_event_id") != purchase_event_id
++                        or (is_kneeq and saved.get("checkout_event_id") != checkout_event_id)):
+                     return json_response(request, {"ok": False, "error": "Attempt conflict"}, 409)
+-                return rfoot_order_response(request, saved)
++                return existing_order_response(request, saved)
+         else:
+             order_ref.set(order)
+
+@@ -1846,6 +1853,103 @@
+ # ============================================================
+ # WAYFORPAY SERVICE CALLBACK
+ # ============================================================
++
++@firestore.transactional
++def record_kneeq_callback(transaction, order_ref, update, status, now):
++    order = order_ref.get(transaction=transaction).to_dict()
++    if status == "Approved":
++        update = {**update, "status": "paid", "paid_at": order.get("paid_at") or now}
++    elif order.get("status") == "paid":
++        return
++    elif status in {"inProcessing", "Pending", "WaitingAuthComplete"}:
++        update = {**update, "status": "created"}
++    else:
++        update = {**update, "status": "failed"}
++
++    transaction.set(order_ref, update, merge=True)
++
++
++@firestore.transactional
++def claim_kneeq_purchase(transaction, order_ref, claim, now):
++    order = order_ref.get(transaction=transaction).to_dict()
++    if order.get("meta_purchase_sent"):
++        return "sent", order
++    if (order.get("meta_purchase_claim_until") or 0) > now:
++        return "pending", order
++    transaction.set(order_ref, {
++        "meta_purchase_claim": claim,
++        "meta_purchase_claim_until": now + 300,
++    }, merge=True)
++    return "claimed", order
++
++
++@firestore.transactional
++def finish_kneeq_purchase(transaction, order_ref, claim, result, now):
++    order = order_ref.get(transaction=transaction).to_dict()
++    if order.get("meta_purchase_claim") != claim:
++        return bool(order.get("meta_purchase_sent"))
++
++    sent = bool(result.get("ok") and (result.get("response") or {}).get("events_received") == 1)
++    update = {
++        "meta_purchase_claim": None,
++        "meta_purchase_claim_until": None,
++        "meta_purchase_last_attempt": result,
++    }
++    if sent:
++        update.update(meta_purchase_sent=True, meta_purchase_sent_at=now, meta_purchase_response=result)
++    transaction.set(order_ref, update, merge=True)
++    return sent
++
++
++def deliver_kneeq_purchase(order_ref):
++    claim = uuid.uuid4().hex
++    state, order = claim_kneeq_purchase(db.transaction(), order_ref, claim, int(time.time()))
++    if state != "claimed":
++        return state == "sent"
++
++    result = send_meta_event(
++        order, "Purchase",
++        order.get("purchase_event_id") or order.get("event_id"),
++        order.get("paid_at"),
++    )
++    sent = finish_kneeq_purchase(db.transaction(), order_ref, claim, result, int(time.time()))
++    if sent:
++        save_funnel_event("meta_purchase_sent", {
++            "order_reference": order.get("order_reference"),
++            "product_id": order.get("product_id"),
++            "pixel_key": order.get("pixel_key"),
++            "purchase_event_id": order.get("purchase_event_id") or order.get("event_id"),
++            "meta_ok": True,
++            "meta_status_code": result.get("status_code"),
++            "meta_duration_ms": result.get("duration_ms"),
++        })
++    return sent
++
++
++def acknowledge_wayforpay(request, order_reference):
++    response_time = int(time.time())
++
++    response_signature = wayforpay_signature(
++        [
++            order_reference,
++            "accept",
++            response_time,
++        ]
++    )
++
++    return json_response(
++        request,
++        {
++            "orderReference": (
++                order_reference
++            ),
++            "status": "accept",
++            "time": response_time,
++            "signature": response_signature,
++        },
++    )
++
++
+
+ def handle_service(request):
+     if request.method != "POST":
+@@ -2037,6 +2141,22 @@
+                     or currency != order.get("currency")):
+                 return json_response(request, {"ok": False, "error": "Invalid Rfoot callback"}, 400)
+
++        is_kneeq = (
++            order.get("product_id") in {"knee_590", "knee_1090"}
++            and clean_url(order.get("event_source_url")) == "https://bogdan92.pro/kneeq/"
++        )
++        if is_kneeq:
++            expected_merchant = (
++                (order.get("wayforpay") or {}).get("merchantAccount") or MERCHANT_ACCOUNT
++            )
++            try:
++                amount_matches = Decimal(str(amount)) == Decimal(str(order.get("value")))
++            except InvalidOperation:
++                amount_matches = False
++            if (merchant_account != expected_merchant or not amount_matches
++                    or currency != order.get("currency")):
++                return json_response(request, {"ok": False, "error": "Payment details mismatch"}, 400)
++
+         already_paid = (
+             order.get("status") == "paid"
+         )
+@@ -2085,7 +2205,11 @@
+             "customer": customer,
+         }
+
+-        if transaction_status == "Approved":
++        if is_kneeq:
++            record_kneeq_callback(
++                db.transaction(), order_ref, update_payload, transaction_status, now
++            )
++        elif transaction_status == "Approved":
+             update_payload.update(
+                 {
+                     "status": "paid",
+@@ -2098,10 +2222,8 @@
+         elif not already_paid:
+             update_payload["status"] = "failed"
+
+-        order_ref.set(
+-            update_payload,
+-            merge=True,
+-        )
++        if not is_kneeq:
++            order_ref.set(update_payload, merge=True)
+
+         save_funnel_event(
+             (
+@@ -2127,10 +2249,10 @@
+             },
+         )
+
+-        if (
+-            transaction_status == "Approved"
+-            and not already_paid
+-        ):
++        if is_kneeq and transaction_status == "Approved":
++            if not deliver_kneeq_purchase(order_ref):
++                return json_response(request, {"ok": False, "error": "Purchase delivery pending"}, 503)
++        elif transaction_status == "Approved" and not already_paid:
+             try:
+                 updated_order = (
+                     order_ref.get().to_dict()
+@@ -2151,7 +2273,6 @@
+                     purchase_event_id,
+                     now,
+                 )
+-
+                 order_ref.set(
+                     {
+                         "meta_purchase_sent": (
+@@ -2215,27 +2336,7 @@
+                     "META PURCHASE ERROR"
+                 )
+
+-        response_time = int(time.time())
+-
+-        response_signature = wayforpay_signature(
+-            [
+-                order_reference,
+-                "accept",
+-                response_time,
+-            ]
+-        )
+-
+-        return json_response(
+-            request,
+-            {
+-                "orderReference": (
+-                    order_reference
+-                ),
+-                "status": "accept",
+-                "time": response_time,
+-                "signature": response_signature,
+-            },
+-        )
++        return acknowledge_wayforpay(request, order_reference)
+
+     except Exception as error:
+         logger.exception(

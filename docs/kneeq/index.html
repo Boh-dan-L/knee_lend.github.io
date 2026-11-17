@@ -5,6 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="Покрокова програма відновлення коліна вдома: 70+ відеовправ, два етапи, тести між етапами, PDF-плани та 6 бонусних відео." name="description"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Реабілітація коліна — покрокова програма вправ</title>
+<link rel="preload" as="image" href="./img/hero.webp" fetchpriority="high"/>
 <link href="./knee.css?v=14" rel="stylesheet"/>
 <link crossorigin="" href="https://bayer-1078313683185.europe-west1.run.app" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -29,6 +30,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-TPZT7VDW');</script>
 <!-- End Google Tag Manager -->
+<script>
+  function queueClarityAfterLoad() {
+    const signalClarity = () => window.dataLayer.push({ event: "kneeq_clarity_ready" });
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(signalClarity, { timeout: 2000 });
+    } else {
+      window.setTimeout(signalClarity, 1000);
+    }
+  }
+
+  window.addEventListener("load", queueClarityAfterLoad, { once: true });
+</script>
 <script>
 (function () {
   function getParam(name) {
@@ -331,15 +344,37 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  const paymentAttempts = new Map();
+  let paymentInProgress = false;
+  let restorePaymentButton = null;
+
+  window.addEventListener("pageshow", function (event) {
+    if (event.persisted) restorePaymentButton?.();
+  });
+
   buttons.forEach(function (btn) {
     btn.addEventListener("click", async function (e) {
       e.preventDefault();
+      if (paymentInProgress) return;
+      paymentInProgress = true;
 
       const originalText = btn.textContent;
-      const purchaseEventId = uuidv4();
-      const checkoutEventId = uuidv4();
-      const clickedAtMs = Date.now();
+      restorePaymentButton = function () {
+        paymentInProgress = false;
+        restorePaymentButton = null;
+        btn.textContent = originalText;
+        btn.disabled = false;
+        btn.classList.remove("is-loading");
+        btn.style.pointerEvents = "";
+      };
       const productId = btn.dataset.productId;
+      const attempt = paymentAttempts.get(productId) || {
+        purchaseEventId: uuidv4(),
+        checkoutEventId: uuidv4(),
+        clickedAtMs: Date.now()
+      };
+      paymentAttempts.set(productId, attempt);
+      const { purchaseEventId, checkoutEventId, clickedAtMs } = attempt;
 
       trackDiagnostic("payment_button_clicked", {
         product_id: productId,
@@ -364,8 +399,6 @@ document.addEventListener("DOMContentLoaded", function () {
         attribution: buildAttributionPayload()
       };
 
-      console.log("PAYLOAD TO API:", payload);
-
       try {
         btn.textContent = "Формуємо платіж...";
         btn.disabled = true;
@@ -374,24 +407,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const startedAt = performance.now();
 
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 12000);
+        let res, data;
+        try {
+          res = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
+          if (res.status >= 400 && res.status < 500) paymentAttempts.delete(productId);
+          data = await res.json();
+        } finally {
+          clearTimeout(timeout);
+        }
 
-        const createOrderMs = Math.round(performance.now() - startedAt);
-        console.log("create-order ms:", createOrderMs);
-        console.log("response status:", res.status);
-
-        const data = await res.json();
-        console.log("response data:", data);
-
+        if (res.ok && data.ok && data.return_url) {
+          window.location.assign(data.return_url);
+          return;
+        }
         if (!res.ok || !data.ok || !data.payment) {
           throw new Error(data.error || "Не вдалося створити оплату");
         }
+
+        const createOrderMs = Math.round(performance.now() - startedAt);
 
         trackDiagnostic("payment_order_created", {
           product_id: productId,
@@ -499,10 +539,7 @@ document.addEventListener("DOMContentLoaded", function () {
           message: String(error?.message || error)
         });
 
-        btn.textContent = originalText;
-        btn.disabled = false;
-        btn.classList.remove("is-loading");
-        btn.style.pointerEvents = "";
+        restorePaymentButton?.();
         alert("Не вдалося створити оплату. Спробуйте ще раз.");
       }
     });
@@ -523,6 +560,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const loadVideo = (video) => {
       if (video.dataset.loaded === 'true') return;
 
+      video.poster = video.dataset.poster;
       const sources = video.querySelectorAll('source[data-src]');
 
       sources.forEach((source) => {
@@ -612,7 +650,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <h2 class="who__title">Для кого ця програма</h2>
 <div class="who__grid">
 <article class="who__card">
-<div class="who__media"><img alt="Біль при спуску або підйомі сходами" loading="lazy" src="./img/stairs.jpg"/></div>
+<div class="who__media"><img alt="Біль при спуску або підйомі сходами" loading="lazy" src="./img/stairs-640.webp" srcset="./img/stairs-320.webp 320w, ./img/stairs-640.webp 640w" sizes="(max-width: 640px) 90vw, 320px"/></div>
 <div class="who__body">
 <h3 class="who__h">Біль при спуску або підйомі сходами</h3>
 <p class="who__p">На сходах коліно болить, рухатися незручно або доводиться берегти ногу.</p>
@@ -709,7 +747,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <div class="program-preview__actions"><a class="btn btn--primary lp-button lp-button--primary" data-scroll-to="#pricing" href="#pricing">Почати програму</a><span>Доступ одразу після оплати</span></div>
 </div>
 <figure class="product-preview__media product-preview__media--video" data-reveal="">
-<video aria-label="Демонстрація програми відновлення коліна в Telegram" autoplay="" class="product-preview__video js-lazy-video" loop="" muted="" playsinline="" poster="./img/teleg.jpg" preload="none">
+<video aria-label="Демонстрація програми відновлення коліна в Telegram" autoplay="" class="product-preview__video js-lazy-video" loop="" muted="" playsinline="" data-poster="./img/teleg.jpg" preload="none">
 <source data-src="./video/telegram-demo.mp4" type="video/mp4"/>
 </video>
 </figure>
